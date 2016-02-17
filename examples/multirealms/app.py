@@ -14,13 +14,13 @@ wamp_realm2 = FlaskAutobahnSync(app, realm=u'realm2')
 
 
 @wamp_default.register('com.realm1.action')
-def _():
+def action1():
     print('Got RPC on com.realm1.action')
     return 'realm1 %s' % datetime.utcnow()
 
 
 @wamp_realm2.register('com.realm2.action')
-def _():
+def action2():
     print('Got RPC on com.realm2.action')
     return 'realm2 %s' % datetime.utcnow()
 

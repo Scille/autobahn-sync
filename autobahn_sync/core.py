@@ -1,15 +1,12 @@
-#! /usr/bin/env python3
-
-
-DEFAULT_AUTOBAHN_ROUTER = u"ws://127.0.0.1:8080/ws"
-DEFAULT_AUTOBAHN_REALM = u"realm1"
-
-
 import crochet
 from autobahn.twisted.wamp import Application
 
 
+DEFAULT_AUTOBAHN_ROUTER = u"ws://127.0.0.1:8080/ws"
+DEFAULT_AUTOBAHN_REALM = u"realm1"
 crochet_initialized = False
+
+
 def init_crochet(in_twisted=False):
     global crochet_initialized
     if crochet_initialized:
@@ -33,13 +30,11 @@ class AutobahnSync(object):
     def call(self, name, *args, **kwargs):
         return self.wapp.session.call(name, *args, **kwargs)
 
-
     def register(self, name, *args, **kwargs):
         @crochet.run_in_reactor
         def decorator(func):
             self.wapp.register(name, *args, **kwargs)(func)
         return decorator
-
 
     def subscribe(self, name, *args, **kwargs):
         @crochet.run_in_reactor
@@ -47,7 +42,8 @@ class AutobahnSync(object):
             self.wapp.subscribe(name, *args, **kwargs)(func)
         return decorator
 
-    def start(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM, in_twisted=False, **kwargs):
+    def start(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
+              in_twisted=False, **kwargs):
         init_crochet(in_twisted=in_twisted)
 
         class ErrorCollector(object):
