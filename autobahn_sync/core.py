@@ -25,11 +25,11 @@ class AutobahnSync(object):
     def __init__(self):
         self.wapp = Application()
 
-    @crochet.wait_for(timeout=1)
+    @crochet.wait_for(timeout=30)
     def publish(self, topic, *args, **kwargs):
         return self.wapp.session.publish(topic, *args, **kwargs)
 
-    @crochet.wait_for(timeout=1)
+    @crochet.wait_for(timeout=30)
     def call(self, name, *args, **kwargs):
         return self.wapp.session.call(name, *args, **kwargs)
 
@@ -50,12 +50,23 @@ class AutobahnSync(object):
     def start(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM, in_twisted=False, **kwargs):
         init_crochet(in_twisted=in_twisted)
 
-        @crochet.run_in_reactor
+        class ErrorCollector(object):
+            exception = None
+
+            def __call__(self, failure):
+                self.exception = failure.value
+
+        connect_error = ErrorCollector()
+
+        @crochet.wait_for(timeout=30)
         def _starter():
-            defer = self.wapp.run(url=url, realm=realm, start_reactor=False, **kwargs)
-            print(defer)
+            d = self.wapp.run(url=url, realm=realm, start_reactor=False, **kwargs)
+            d.addErrback(connect_error)
+            return d
 
         _starter()
+        if connect_error.exception:
+            raise connect_error.exception
 
 
 default_app = AutobahnSync()
