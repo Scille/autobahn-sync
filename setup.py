@@ -35,7 +35,7 @@ def read(fname):
 
 
 setup(
-    name='autobahn_sync',
+    name='autobahn-sync',
     version=__version__,
     description='Bring autobahn to your synchronous apps !',
     long_description=read('README.rst'),
