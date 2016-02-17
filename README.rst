@@ -42,7 +42,7 @@ Also see the `examples <https://github.com/Scille/autobahn_sync/blob/master/exam
 Bonus
 -----
 
-See `extensions <https://github.com/Scille/autobahn_sync/blob/master/extensions>`_ folder for a nice Flask extension ;-)
+See `extensions <https://github.com/Scille/autobahn_sync/tree/master/autobahn_sync/extensions>`_ folder for a nice Flask extension ;-)
 
 Get it now
 ----------
