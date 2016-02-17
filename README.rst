@@ -7,6 +7,8 @@ Autobahn~Sync
 
 `Autobahn <http://autobahn.ws>`_ integration with `crochet <https://github.com/itamarst/crochet>`_ to provide WAMP for synchronous applications.
 
+Originaly based on the work of `Sam & Max <http://sametmax.com/les-managers-le-detestent-faites-tourner-wamp-dans-django-avec-cette-astuce-insolite/>`_.
+
 Quick example
 -------------
 
@@ -32,15 +34,15 @@ Quick example
 
 
 This code will connect to the crossbar router (don't forget to start it
-before trying this snippet !) listenening `ws://127.0.0.1:8080/ws`
-and register itself in realm `realm1`.
+before trying this snippet !) listenening ``ws://127.0.0.1:8080/ws``
+and register itself in realm ``realm1``.
 
-TODO
-----
+Also see the `examples <https://github.com/Scille/autobahn_sync/blob/master/examples>`_ for more usecases
 
-- docs
-- tests
-- ...
+Bonus
+-----
+
+See `extensions <https://github.com/Scille/autobahn_sync/blob/master/extensions>`_ folder for a nice Flask extension ;-)
 
 Get it now
 ----------
