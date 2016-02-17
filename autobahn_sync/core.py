@@ -1,5 +1,5 @@
 import crochet
-from autobahn.twisted.wamp import Application
+from autobahn.twisted.wamp import Application, ApplicationRunner
 
 
 DEFAULT_AUTOBAHN_ROUTER = u"ws://127.0.0.1:8080/ws"
@@ -56,7 +56,8 @@ class AutobahnSync(object):
 
         @crochet.wait_for(timeout=30)
         def _starter():
-            d = self.wapp.run(url=url, realm=realm, start_reactor=False, **kwargs)
+            runner = ApplicationRunner(url=url, realm=realm, **kwargs)
+            d = runner.run(self.wapp.__call__, start_reactor=False)
             d.addErrback(connect_error)
             return d
 
