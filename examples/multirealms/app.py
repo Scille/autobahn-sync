@@ -8,7 +8,8 @@ from autobahn_sync.extensions.flask import FlaskAutobahnSync
 
 
 app = Flask(__name__)
-app.config['AUTHOBAHN_IN_TWISTED'] = environ.get('AUTHOBAHN_IN_TWISTED', '').lower() == 'true'
+# Current example is run directly inside crossbar which makes use of twisted
+app.config['AUTHOBAHN_IN_TWISTED'] = True
 wamp_default = FlaskAutobahnSync(app)
 wamp_realm2 = FlaskAutobahnSync(app, realm=u'realm2')
 
