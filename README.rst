@@ -2,6 +2,11 @@
     :target: https://travis-ci.org/Scille/autobahn-sync
     :alt: Travis-CI
 
+.. image:: https://readthedocs.org/projects/autobahn-sync/badge/?version=latest
+    :target: http://autobahn-sync.readthedocs.org/en/latest/?badge=latest
+    :alt: Documentation Status
+
+
 Autobahn~Sync
 =============
 
