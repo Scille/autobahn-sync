@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/Scille/autobahn_sync.svg?branch=master
-    :target: https://travis-ci.org/Scille/autobahn_sync
+.. image:: https://travis-ci.org/Scille/autobahn-sync.svg?branch=master
+    :target: https://travis-ci.org/Scille/autobahn-sync
     :alt: Travis-CI
 
 Autobahn~Sync
