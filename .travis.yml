@@ -1,20 +1,19 @@
-# Config file for automatic testing at travis-ci.org
-
-# Containerized builds
 sudo: false
-
 language: python
-
 python:
-  - "3.4"
-  - "2.7"
-#  - "pypy" # need pypy>2.6
-
+- '3.4'
+- '2.7'
 install:
-  - pip install -r dev-requirements.txt
-  - pip install -U .
-
+- pip install -r dev-requirements.txt
+- pip install -U .
 before_script:
-  - flake8 .
-
+- flake8 .
 script: py.test -s -v
+deploy:
+  provider: pypi
+  user: touilleMan
+  on:
+    tags: true
+    repo: Scille/autobahn-sync
+  password:
+    secure: HC//4Gwrelt5c+7yFEDFGl09tKoOk0PJXQ165s5mYsgC4f/KOKdstxlan/fZKnAzlA3AR94yHc8JAeUlmiKG4yBhS8i9bNUlgZl2sZovfUxozYrpqdxneRiXmRqEdZH+mLXIiExTx6bAatQjCgKCeSnrwyAdVs2djL99BXBAQ1xdDfqrDdRc07tqDWcrBdCnDohuM7v8Lfz3q3oBLwmG9ffh+C9BaU65+/VIlqV0mpc56tNCg8qb1aP9enTrxDZcwuDW5u78tL2ocKhz9lY7G7h/5HWKihtwM37sYf3b0FrsJ7G8IwFKR2JIbIhWWAObm+BFCHiE3xeEn51xvNA0S+mR7DkGioL3xFJN2oTz7T3HcKnz6iYC+dffXsHaV5nUV1azHmz8j7BIIm8mMdzjQqxNvS5H+haBUqXCPOHZlZN8Vr9BPcWjiQ0vxfeWLRc7nPp3sGK1uGgkcFFLdfuaq3KDtqUGggTLxu652PdX7rYFSuxTYks+69ll8nZgcKNAQoG9VO8wgp2WYqmmSrgh08HNtPPGoUz7rt47b/+5t06VKMqZAD0/jNyrpy94+CgMoSbofcrtRHRKkIsp0IRqXz/ktF8IUf0Wa4+7Veg0FvWfotUFAJPLuRo79s7Wf047H2HDqcXszNaAfjod1mL6Dl3+SdZZWwfHKis5OtWJECw=
