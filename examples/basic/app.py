@@ -27,7 +27,7 @@ def main():
 
 
 @wamp.subscribe('com.clock.connection')
-def tick_listener(tick):
+def tick_listener():
     print('Received com.clock.connection')
 
 
