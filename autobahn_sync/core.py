@@ -19,24 +19,30 @@ def init_crochet(in_twisted=False):
 
 
 class AutobahnSync(object):
+    "TODO: complete me !"
+
     def __init__(self):
         self.wapp = Application()
 
     @crochet.wait_for(timeout=30)
     def publish(self, topic, *args, **kwargs):
+        "Decorator for the publish"
         return self.wapp.session.publish(topic, *args, **kwargs)
 
     @crochet.wait_for(timeout=30)
     def call(self, name, *args, **kwargs):
+        "Decorator for the call"
         return self.wapp.session.call(name, *args, **kwargs)
 
     def register(self, name, *args, **kwargs):
+        "Decorator for the register"
         @crochet.run_in_reactor
         def decorator(func):
             self.wapp.register(name, *args, **kwargs)(func)
         return decorator
 
     def subscribe(self, name, *args, **kwargs):
+        "Decorator for the subscribe"
         @crochet.run_in_reactor
         def decorator(func):
             self.wapp.subscribe(name, *args, **kwargs)(func)
@@ -44,6 +50,7 @@ class AutobahnSync(object):
 
     def start(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
               in_twisted=False, **kwargs):
+        "Start the background twisted thread and create the wamp connection"
         init_crochet(in_twisted=in_twisted)
 
         class ErrorCollector(object):

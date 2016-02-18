@@ -4,7 +4,9 @@ from autobahn_sync.core import (
 from twisted.internet.error import ConnectionRefusedError  # noqa republishing
 
 __version__ = "0.1.2"
+__license__ = 'MIT'
+
 __all__ = (
-    DEFAULT_AUTOBAHN_ROUTER, DEFAULT_AUTOBAHN_REALM,
-    AutobahnSync, default_app, publish, call, register, subscribe, start,
-    ConnectionRefusedError)
+    'DEFAULT_AUTOBAHN_ROUTER', 'DEFAULT_AUTOBAHN_REALM',
+    'AutobahnSync', 'default_app', 'publish', 'call', 'register', 'subscribe', 'start',
+    'ConnectionRefusedError')

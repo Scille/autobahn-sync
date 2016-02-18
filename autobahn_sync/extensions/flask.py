@@ -26,8 +26,7 @@ class FlaskAutobahnSync(object):
             self.config['in_twisted'] = in_twisted
         self.autobahn_sync.start(url=self.config['router'],
                                  realm=self.config['realm'],
-                                 in_twisted=self.config['in_twisted'],
-                                 debug_app=app.debug)
+                                 in_twisted=self.config['in_twisted'])
 
     def __getattr__(self, name):
         if name in ('publish', 'call', 'register', 'subscribe'):
