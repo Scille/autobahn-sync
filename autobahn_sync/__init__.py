@@ -3,7 +3,7 @@ from autobahn_sync.core import (
     AutobahnSync, default_app, publish, call, register, subscribe, start)
 from twisted.internet.error import ConnectionRefusedError  # noqa republishing
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __license__ = 'MIT'
 
 __all__ = (
