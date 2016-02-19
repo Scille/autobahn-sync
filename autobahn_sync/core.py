@@ -53,6 +53,25 @@ class AutobahnSync(object):
         "Start the background twisted thread and create the wamp connection"
         init_crochet(in_twisted=in_twisted)
 
+        if in_twisted:
+            self._in_twisted_start(url=url, realm=realm, **kwargs)
+        else:
+            self._out_twisted_start(url=url, realm=realm, **kwargs)
+
+    def _in_twisted_start(self, **kwargs):
+
+        class ErrorCollector(object):
+            def __call__(self, failure):
+                raise failure.value
+
+        connect_error = ErrorCollector()
+
+        runner = ApplicationRunner(**kwargs)
+        d = runner.run(self.wapp.__call__, start_reactor=False)
+        d.addErrback(connect_error)
+
+    def _out_twisted_start(self, **kwargs):
+
         class ErrorCollector(object):
             exception = None
 
@@ -63,7 +82,7 @@ class AutobahnSync(object):
 
         @crochet.wait_for(timeout=30)
         def _starter():
-            runner = ApplicationRunner(url=url, realm=realm, **kwargs)
+            runner = ApplicationRunner(**kwargs)
             d = runner.run(self.wapp.__call__, start_reactor=False)
             d.addErrback(connect_error)
             return d
