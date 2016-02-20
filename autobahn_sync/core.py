@@ -7,7 +7,7 @@ DEFAULT_AUTOBAHN_REALM = u"realm1"
 crochet_initialized = False
 
 
-def init_crochet(in_twisted=False):
+def _init_crochet(in_twisted=False):
     global crochet_initialized
     if crochet_initialized:
         return
@@ -19,30 +19,45 @@ def init_crochet(in_twisted=False):
 
 
 class AutobahnSync(object):
-    "TODO: complete me !"
-
+    """AutobahnSync main class, wrapp the ``Autobahn`` api within ``crochet``
+    to turn it synchronous
+    """
     def __init__(self):
         self.wapp = Application()
+        self._started = False
 
     @crochet.wait_for(timeout=30)
     def publish(self, topic, *args, **kwargs):
-        "Decorator for the publish"
+        """Publish an event to a topic.
+
+        Replace :meth:`autobahn.wamp.interface.IApplicationSession.publish`
+        """
         return self.wapp.session.publish(topic, *args, **kwargs)
 
     @crochet.wait_for(timeout=30)
     def call(self, name, *args, **kwargs):
-        "Decorator for the call"
+        """Call a remote procedure.
+
+        Replace :meth:`autobahn.wamp.interface.IApplicationSession.call`
+        """
         return self.wapp.session.call(name, *args, **kwargs)
 
     def register(self, name, *args, **kwargs):
-        "Decorator for the register"
+        """Decorator exposing a function as a remote callable procedure.
+
+        Replace :meth:`autobahn.wamp.interface.IApplicationSession.register`
+        """
+
         @crochet.run_in_reactor
         def decorator(func):
             self.wapp.register(name, *args, **kwargs)(func)
         return decorator
 
     def subscribe(self, name, *args, **kwargs):
-        "Decorator for the subscribe"
+        """Decorator attaching a function as an event handler.
+
+        Replace :meth:`autobahn.wamp.interface.IApplicationSession.subscribe`
+        """
         @crochet.run_in_reactor
         def decorator(func):
             self.wapp.subscribe(name, *args, **kwargs)(func)
@@ -50,13 +65,19 @@ class AutobahnSync(object):
 
     def start(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
               in_twisted=False, **kwargs):
-        "Start the background twisted thread and create the wamp connection"
-        init_crochet(in_twisted=in_twisted)
+        """Start the background twisted thread and create the wamp connection
+
+        .. note:: This function must be called first
+        """
+        if self._started:
+            raise RuntimeError("This AutobahnSync instance is already started")
+        _init_crochet(in_twisted=in_twisted)
 
         if in_twisted:
             self._in_twisted_start(url=url, realm=realm, **kwargs)
         else:
             self._out_twisted_start(url=url, realm=realm, **kwargs)
+        self._started = True
 
     def _in_twisted_start(self, **kwargs):
 

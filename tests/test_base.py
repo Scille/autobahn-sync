@@ -1,3 +1,5 @@
+import pytest
+
 from autobahn_sync import AutobahnSync, ConnectionRefusedError
 
 from fixtures import crossbar
@@ -8,6 +10,12 @@ class Test(object):
     def test_connect(self, crossbar):
         wamp = AutobahnSync()
         wamp.start()
+
+    def test_already_started(self, crossbar):
+        wamp = AutobahnSync()
+        wamp.start()
+        with pytest.raises(RuntimeError):
+            wamp.start()
 
     def test_rpc(self, crossbar):
         wamp = AutobahnSync()
