@@ -55,3 +55,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Crossbar stuff
+node.key
+node.pid
