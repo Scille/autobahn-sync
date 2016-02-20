@@ -8,4 +8,4 @@ class TestBadRouter(object):
     def test_router_not_started(self):
         wamp = AutobahnSync()
         with pytest.raises(ConnectionRefusedError):
-            wamp.start()
+            wamp.start(url=u'ws://localhost:9999/missing')
