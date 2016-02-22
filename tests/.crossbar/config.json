@@ -9,6 +9,59 @@
          },
          "realms": [
             {
+               "name": "realm_limited",
+               "roles": [
+                  {
+                     "name": "anonymous",
+                     "permissions": [
+                        {
+                           "uri": "test.no_publish.*",
+                           "publish": false,
+                           "subscribe": true,
+                           "call": true,
+                           "register": true
+                        }
+                     ]
+                  },
+                  {
+                     "name": "anonymous",
+                     "permissions": [
+                        {
+                           "uri": "test.no_subscribe.*",
+                           "publish": true,
+                           "subscribe": false,
+                           "call": true,
+                           "register": true
+                        }
+                     ]
+                  },
+                  {
+                     "name": "anonymous",
+                     "permissions": [
+                        {
+                           "uri": "test.no_call.*",
+                           "publish": true,
+                           "subscribe": true,
+                           "call": false,
+                           "register": true
+                        }
+                     ]
+                  },
+                  {
+                     "name": "anonymous",
+                     "permissions": [
+                        {
+                           "uri": "test.no_register.*",
+                           "publish": true,
+                           "subscribe": true,
+                           "call": true,
+                           "register": false
+                        }
+                     ]
+                  }
+               ]
+            },
+            {
                "name": "realm1",
                "roles": [
                   {
@@ -23,7 +76,16 @@
                         }
                      ]
                   }
-               ]
+               ],
+"store": {
+   "type": "memory",
+   "event-history": [
+      {
+         "uri": "com.historized.event",
+         "limit": 10000
+      }
+   ]
+}
             }
          ],
          "transports": [

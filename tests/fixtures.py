@@ -20,7 +20,9 @@ def crossbar(request):
         sleep(0.5)
         # Try to engage a wamp connection with crossbar to make sure it is started
         try:
-            AutobahnSync().start()
+            test_app = AutobahnSync()
+            test_app.run()
+            # test_app.session.disconnect()  # TODO: fix me
         except ConnectionRefusedError:
             continue
         else:
@@ -35,3 +37,15 @@ def crossbar(request):
 
     if START_CROSSBAR:
         request.addfinalizer(finalizer)
+
+
+@pytest.fixture
+def wamp(crossbar):
+    wamp = AutobahnSync()
+    wamp.run()
+    return wamp
+
+
+@pytest.fixture
+def wamp2(crossbar):
+    return wamp(crossbar)

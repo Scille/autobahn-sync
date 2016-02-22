@@ -1,32 +1,19 @@
 import pytest
 
-from autobahn_sync import AutobahnSync, ConnectionRefusedError
+from autobahn_sync import AutobahnSync, ConnectionRefusedError, AlreadyRunningError
 
-from fixtures import crossbar
+from fixtures import crossbar, wamp
 
 
 class Test(object):
 
     def test_connect(self, crossbar):
         wamp = AutobahnSync()
-        wamp.start()
+        wamp.run()
 
-    def test_already_started(self, crossbar):
+    def test_already_running(self, crossbar):
         wamp = AutobahnSync()
-        wamp.start()
-        with pytest.raises(RuntimeError):
-            wamp.start()
+        wamp.run()
 
-    def test_rpc(self, crossbar):
-        wamp = AutobahnSync()
-        rpc_calls = []
-        token = '4242'
-
-        @wamp.register('com.app.rpc')
-        def my_rpc(e):
-            assert e == 'arg'
-            rpc_calls.append(token)
-            return token
-
-        # ret = wamp.call('com.app.rpc', 'arg')
-        # assert rpc_called == [token]
+        with pytest.raises(AlreadyRunningError):
+            wamp.run()

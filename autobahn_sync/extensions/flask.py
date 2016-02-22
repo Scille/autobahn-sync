@@ -10,6 +10,7 @@ class FlaskAutobahnSync(AutobahnSync):
     """
 
     def __init__(self, app=None, **config):
+        super(FlaskAutobahnSync, self).__init__()
         self.config = {
             'router': DEFAULT_AUTOBAHN_ROUTER,
             'realm': DEFAULT_AUTOBAHN_REALM,
