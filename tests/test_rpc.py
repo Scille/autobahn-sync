@@ -17,7 +17,7 @@ class CounterHelper(object):
 
 class TestRPC(object):
 
-    def test_no_register(self):
+    def test_no_register(self, crossbar):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
         with pytest.raises(ApplicationError) as exc:
@@ -25,7 +25,7 @@ class TestRPC(object):
         assert str(exc.value.args[0]) == u"session is not authorized to register procedure 'test.no_register.func'"
 
     @pytest.mark.xfail(reason='Must inverstigate in crossbar code...')
-    def test_no_call(self):
+    def test_no_call(self, crossbar):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
         wamp.session.register(lambda: None, u'test.no_call.func')
@@ -103,7 +103,7 @@ class TestRPC(object):
         assert rets == [1, 2, 3]
 
     @pytest.mark.xfail(reason='Need lazy decorator registration first')
-    def test_decorate_before_run(self):
+    def test_decorate_before_run(self, crossbar):
         wamp = AutobahnSync()
         rets = []
         counter_func = CounterHelper()

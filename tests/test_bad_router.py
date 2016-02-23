@@ -3,6 +3,8 @@ import pytest
 from autobahn_sync import AutobahnSync, ConnectionRefusedError, AbortError
 from autobahn.wamp.exception import ApplicationError
 
+from fixtures import crossbar
+
 
 class TestBadRouter(object):
 
@@ -11,7 +13,7 @@ class TestBadRouter(object):
         with pytest.raises(ConnectionRefusedError):
             wamp.run(url=u'ws://localhost:9999/missing')
 
-    def test_bad_realm(self):
+    def test_bad_realm(self, crossbar):
         wamp = AutobahnSync()
         with pytest.raises(AbortError) as exc:
             wamp.run(realm=u'bad_realm')

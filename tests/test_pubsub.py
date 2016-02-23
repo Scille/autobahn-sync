@@ -9,7 +9,7 @@ from fixtures import crossbar, wamp, wamp2
 
 class TestBadRouter(object):
 
-    def test_no_subscribe(self):
+    def test_no_subscribe(self, crossbar):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
         with pytest.raises(ApplicationError) as exc:
@@ -17,7 +17,7 @@ class TestBadRouter(object):
         assert str(exc.value.args[0]) == "session is not authorized to subscribe to topic 'test.no_subscribe.event'"
 
     @pytest.mark.xfail(reason='Must inverstigate in crossbar code...')
-    def test_no_publish(self):
+    def test_no_publish(self, crossbar):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
         wamp.session.subscribe(lambda: None, 'test.no_publish.event')
@@ -67,7 +67,7 @@ class TestBadRouter(object):
         assert events == [(('1',), {}), (('2',), {}), ((), {'opt': True})]
 
     @pytest.mark.xfail(reason='Need lazy decorator registration first')
-    def test_decorate_before_run(self):
+    def test_decorate_before_run(self, crossbar):
         wamp = AutobahnSync()
 
         @wamp.subscribe('com.app.event')
