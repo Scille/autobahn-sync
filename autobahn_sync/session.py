@@ -2,8 +2,13 @@ import crochet
 from autobahn.wamp import message, types
 from autobahn.twisted.wamp import ApplicationSession
 from twisted.internet import defer
+from functools import partial
 
 from .exceptions import AbortError
+from .logger import logger
+
+
+__all__ = ('AsyncSession', 'SyncSession')
 
 
 class AsyncSession(ApplicationSession):
@@ -16,14 +21,13 @@ class AsyncSession(ApplicationSession):
         self.on_join_defer = defer.Deferred()
 
     def onMessage(self, msg):
-        print('2 - ON MESSAGE ', msg)
         if not self.is_attached():
             if isinstance(msg, message.Abort):
+                logger.debug('Received ABORT answer to our HELLO', msg)
                 details = types.CloseDetails(msg.reason, msg.message)
-                print('+++> Errback', msg)
                 self.on_join_defer.errback(AbortError(details))
             else:
-                print('+++> Callback', msg)
+                logger.debug('Received WELCOME answer to our HELLO', msg)
                 self.on_join_defer.callback(msg)
         return super(AsyncSession, self).onMessage(msg)
 
@@ -32,9 +36,9 @@ class SyncSession(object):
     """Synchronous subclass of :class:`autobahn.twisted.wamp._ApplicationSession`.
     """
 
-    def __init__(self, async_session):
-        print('BUILDING SYNC SESSION', async_session)
+    def __init__(self, async_session, callbacks_runner):
         self._async_session = async_session
+        self._callbacks_runner = callbacks_runner
 
     # @crochet.wait_for(timeout=30)
     # def disconnect(self):
@@ -58,7 +62,7 @@ class SyncSession(object):
     #     Replace :meth:`autobahn.wamp.interface.IApplicationSession.register`
     #     """
     #     reg = self._register(endpoint, procedure=procedure, options=options)
-    #     # 
+    #     #
     #     async_unregister = reg.unregister
     #     from functools import wraps
     #     @crochet.wait_for(timeout=30)
@@ -79,7 +83,9 @@ class SyncSession(object):
 
         Replace :meth:`autobahn.wamp.interface.IApplicationSession.register`
         """
-        return self._async_session.register(endpoint, procedure=procedure, options=options)
+        def proxy_endpoint(*args, **kwargs):
+            return self._callbacks_runner.put(partial(endpoint, *args, **kwargs))
+        return self._async_session.register(proxy_endpoint, procedure=procedure, options=options)
 
     @crochet.wait_for(timeout=30)
     def unregister(self, registration):
@@ -99,4 +105,6 @@ class SyncSession(object):
 
         Replace :meth:`autobahn.wamp.interface.IApplicationSession.subscribe`
         """
-        return self._async_session.subscribe(handler, topic=topic, options=options)
+        def proxy_handler(*args, **kwargs):
+            return self._callbacks_runner.put(partial(handler, *args, **kwargs))
+        return self._async_session.subscribe(proxy_handler, topic=topic, options=options)

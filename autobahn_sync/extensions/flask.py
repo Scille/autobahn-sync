@@ -39,6 +39,6 @@ class FlaskAutobahnSync(AutobahnSync):
             self.config['realm'] = realm
         if in_twisted:
             self.config['in_twisted'] = in_twisted
-        self.start(url=self.config['router'],
+        self.run(url=self.config['router'],
                    realm=self.config['realm'],
                    in_twisted=self.config['in_twisted'])

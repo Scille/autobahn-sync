@@ -1,5 +1,24 @@
-from autobahn.wamp.exception import *  # noqa republishing
+from autobahn.wamp.exception import (
+    Error, SessionNotReady, SerializationError, ProtocolError,
+    TransportLost, ApplicationError, NotAuthorized, InvalidUri)  # noqa republishing
 from twisted.internet.error import ConnectionRefusedError  # noqa republishing
+
+
+__all__ = (
+    'Error',
+    'SessionNotReady',
+    'SerializationError',
+    'ProtocolError',
+    'TransportLost',
+    'ApplicationError',
+    'NotAuthorized',
+    'InvalidUri',
+
+    'ConnectionRefusedError',
+
+    'AbortError',
+    'AlreadyRunningError'
+)
 
 
 class AbortError(Error):
