@@ -4,7 +4,7 @@ import autobahn_sync
 
 
 try:
-    input = raw_input
+    input = raw_input  # noqa
 except:  # Except if we use Python3
     pass
 

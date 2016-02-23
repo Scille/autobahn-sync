@@ -15,4 +15,4 @@ class TestBadRouter(object):
         wamp = AutobahnSync()
         with pytest.raises(AbortError) as exc:
             wamp.run(realm=u'bad_realm')
-        assert str(exc.value.message) == 'CloseDetails(reason=<wamp.error.no_such_realm>, message=\'no realm "bad_realm" exists on this router\')'
+        assert str(exc.value.args[0]) == 'CloseDetails(reason=<wamp.error.no_such_realm>, message=\'no realm "bad_realm" exists on this router\')'

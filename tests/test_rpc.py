@@ -22,7 +22,7 @@ class TestRPC(object):
         wamp.run(realm=u'realm_limited')
         with pytest.raises(ApplicationError) as exc:
             wamp.session.register(lambda: None, u'test.no_register.func')
-        assert str(exc.value.message) == u"session is not authorized to register procedure 'test.no_register.func'"
+        assert str(exc.value.args[0]) == u"session is not authorized to register procedure 'test.no_register.func'"
 
     @pytest.mark.xfail(reason='Must inverstigate in crossbar code...')
     def test_no_call(self):
@@ -31,7 +31,7 @@ class TestRPC(object):
         wamp.session.register(lambda: None, u'test.no_call.func')
         with pytest.raises(ApplicationError) as exc:
             wamp.session.call(u'test.no_call.func', None)
-        assert str(exc.value.message) == u"session is not authorized to call procedure 'test.no_register.func'"
+        assert str(exc.value.args[0]) == u"session is not authorized to call procedure 'test.no_register.func'"
 
     def test_history(self, wamp):
         # First create some stuff in the history
@@ -49,6 +49,7 @@ class TestRPC(object):
         assert [e[u'kwargs'] for e in events] == [{'args': True}, None, None]
         assert [e[u'args'] for e in events] == [[], ['2'], [1]]
 
+    @pytest.mark.skipif("sys.version_info >= (3,0)", reason="Autobahn bug with Python3 encoding")
     def test_bad_history(self, wamp):
         # Cannot get history on this one, should raise exception then
         sub = wamp.session.subscribe(lambda: None, 'com.not_historized.event')
@@ -73,11 +74,11 @@ class TestRPC(object):
         # with pytest.raises():
         with pytest.raises(ApplicationError) as exc:
             wamp.session.call('com.unregister.func')
-        assert str(exc.value.message) == u'no callee registered for procedure <com.unregister.func>'
+        assert str(exc.value.args[0]) == u'no callee registered for procedure <com.unregister.func>'
         # Cannot unregister 2 times
         with pytest.raises(Exception) as exc:
             wamp.session.unregister(reg)
-        assert str(exc.value.message) == 'registration no longer active'
+        assert str(exc.value.args[0]) == 'registration no longer active'
 
     def test_single_wamp_use_session(self, wamp):
         rets = []
