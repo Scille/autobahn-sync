@@ -2,10 +2,6 @@ import argparse
 import peewee as pw
 import autobahn_sync
 
-import sys
-from twisted.python import log
-# log.startLogging(sys.stdout)
-
 
 try:
     input = raw_input

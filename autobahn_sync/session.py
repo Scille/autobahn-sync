@@ -34,18 +34,7 @@ class AsyncSession(ApplicationSession):
     def onUserError(self, fail, msg):
         logger.error('%s\n%s' % (msg, fail.getTraceback()))
         super(AsyncSession, self).onUserError(fail, msg)
-    def onClose(self, wasClean):
-        print('====> onClose')
-        super(AsyncSession, self).onClose(wasClean)
-    def onJoin(self, details):
-        print('====> self')
-        super(AsyncSession, self).onJoin(details)
-    def onLeave(self, details):
-        print('====> onLeave')
-        super(AsyncSession, self).onLeave(details)
-    def onDisconnect(self):
-        print('====> onDisconnect')
-        super(AsyncSession, self).onDisconnect()
+
 
 class SyncSession(object):
     """Synchronous subclass of :class:`autobahn.twisted.wamp._ApplicationSession`.
@@ -78,7 +67,6 @@ class SyncSession(object):
         Replace :meth:`autobahn.wamp.interface.IApplicationSession.register`
         """
         def proxy_endpoint(*args, **kwargs):
-            import threading; print('PROXY ENDPOINT >>> ', threading.current_thread())
             return self._callbacks_runner.put(partial(endpoint, *args, **kwargs))
         return self._async_session.register(proxy_endpoint, procedure=procedure, options=options)
 

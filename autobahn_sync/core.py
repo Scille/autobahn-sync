@@ -1,7 +1,6 @@
 import crochet
 from autobahn.twisted.wamp import Application, ApplicationRunner
 from twisted.internet import defer, threads
-from functools import partial
 
 from .logger import logger
 from .exceptions import AlreadyRunningError

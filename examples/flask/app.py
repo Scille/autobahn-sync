@@ -25,9 +25,9 @@ def bootstrap():
 
 @app.route('/')
 def main():
+    timestamp = str(datetime.utcnow())
     print('[Worker %s] Serve request on timestamp %s' % (worker_id, timestamp))
     publish_opt = PublishOptions(exclude_me=False)
-    timestamp = str(datetime.utcnow())
     app.wamp.session.publish('com.flask_app.page_served', worker_id,
                              timestamp, options=publish_opt)
     txts = [
