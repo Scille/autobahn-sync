@@ -1,6 +1,7 @@
 import crochet
 from autobahn.twisted.wamp import Application, ApplicationRunner
-from twisted.internet import defer
+from twisted.internet import defer, threads
+from functools import partial
 
 from .logger import logger
 from .exceptions import AlreadyRunningError
@@ -51,58 +52,68 @@ class AutobahnSync(object):
         self._error_collector_cls = None
         self._callbacks_runner = None
 
+    def run_in_twisted(self, callback, url=DEFAULT_AUTOBAHN_ROUTER,
+                       realm=DEFAULT_AUTOBAHN_REALM, blocking=False, **kwargs):
+        """
+        """
+        _init_crochet(in_twisted=True)
+        logger.debug('run_in_crossbar, bootstraping')
+
+        def bootstrap_and_callback():
+            self._bootstrap(blocking, url=url, realm=realm, **kwargs)
+            callback()
+
+        threads.deferToThread(bootstrap_and_callback)
+
     def run(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
-            in_twisted=False, blocking=False, **kwargs):
+            blocking=False, **kwargs):
         """Start the background twisted thread and create the wamp connection
 
         .. note:: This function must be called first
         """
+        _init_crochet(in_twisted=False)
+        self._bootstrap(blocking, url=url, realm=realm, **kwargs)
+
+    def stop(self):
+        if not self._started:
+            raise AlreadyRunningError("This AutobahnSync instance is not started")
+        self._callbacks_runner.stop()
+
+    # def _in_twisted_start(self, **kwargs):
+    #     threads.deferToThread(partial(self._out_twisted_start, **kwargs))
+        # self._error_collector_cls = InTwistedErrorCollector
+        # self._async_runner = ApplicationRunner(**kwargs)
+        # d = self._async_runner.run(self._async_app, start_reactor=False)
+        # d.addErrback(self._error_collector_cls())
+
+    def _bootstrap(self, blocking, **kwargs):
         if self._started:
             raise AlreadyRunningError("This AutobahnSync instance is already started")
-        _init_crochet(in_twisted=in_twisted)
-
+        self._started = True
         if blocking:
             self._callbacks_runner = CallbacksRunner()
         else:
             self._callbacks_runner = ThreadedCallbacksRunner()
-        if in_twisted:
-            raise NotImplementedError()
-            # self._in_twisted_start(url=url, realm=realm, **kwargs)
-        else:
-            self._out_twisted_start(url=url, realm=realm, **kwargs)
-        self._started = True
-        self._callbacks_runner.start()
-
-    def stop(self):
-        self._callbacks_runner.stop()
-
-    # def _in_twisted_start(self, **kwargs):
-    #     self._error_collector_cls = InTwistedErrorCollector
-    #     self._async_runner = ApplicationRunner(**kwargs)
-    #     d = self._async_runner.run(self._async_app, start_reactor=False)
-    #     d.addErrback(self._error_collector_cls())
-
-    def _out_twisted_start(self, **kwargs):
 
         @crochet.wait_for(timeout=30)
-        def bootstrap():
+        def start_runner():
             ready_deferred = defer.Deferred()
-            logger.debug('start bootstrap')
+            logger.debug('[CrochetReactor] start bootstrap')
 
             def register_session(config):
-                logger.debug('start register_session')
+                logger.debug('[CrochetReactor] start register_session')
                 self._async_session = AsyncSession(config=config)
                 self.session = SyncSession(self._async_session, self._callbacks_runner)
 
                 def resolve(result):
-                    logger.debug('callback resolve', result)
+                    logger.debug('[CrochetReactor] callback resolve: %s' % result)
                     ready_deferred.callback(result)
                     return result
 
                 self._async_session.on_join_defer.addCallback(resolve)
 
                 def resolve_error(failure):
-                    logger.debug('errback resolve_error', failure)
+                    logger.debug('[CrochetReactor] errback resolve_error: %s' % failure)
                     ready_deferred.errback(failure)
 
                 self._async_session.on_join_defer.addErrback(resolve_error)
@@ -115,11 +126,12 @@ class AutobahnSync(object):
                 ready_deferred.errback(failure)
 
             d.addErrback(connect_error)
-            logger.debug('end bootstrap')
+            logger.debug('[CrochetReactor] end bootstrap')
             return ready_deferred
 
-        logger.debug('call bootstrap')
-        bootstrap()
+        logger.debug('[MainThread] call bootstrap')
+        start_runner()
+        self._callbacks_runner.start()
 
     def register(self, procedure=None, options=None):
         "Decorator for the register"

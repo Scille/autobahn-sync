@@ -1,6 +1,9 @@
 from autobahn_sync import AutobahnSync, DEFAULT_AUTOBAHN_ROUTER, DEFAULT_AUTOBAHN_REALM
 
 
+__all__ = ('FlaskAutobahnSync', )
+
+
 class FlaskAutobahnSync(AutobahnSync):
 
     """Inherit from :class:`autobahn_sync.AutobahnSync` to integrate it with Flask.
@@ -38,7 +41,6 @@ class FlaskAutobahnSync(AutobahnSync):
         if realm:
             self.config['realm'] = realm
         if in_twisted:
-            self.config['in_twisted'] = in_twisted
-        self.run(url=self.config['router'],
-                   realm=self.config['realm'],
-                   in_twisted=self.config['in_twisted'])
+            self.run_in_twisted(url=self.config['router'], realm=self.config['realm'])
+        else:
+            self.run(url=self.config['router'], realm=self.config['realm'])

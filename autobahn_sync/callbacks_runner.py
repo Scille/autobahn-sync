@@ -8,6 +8,9 @@ except ImportError:
     from Queue import Queue
 
 
+__all__ = ('CallbacksRunner', 'ThreadedCallbacksRunner')
+
+
 class CallbacksRunner(object):
     def __init__(self):
         self._started = False

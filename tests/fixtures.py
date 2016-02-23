@@ -1,5 +1,6 @@
 from os import path
 from time import sleep
+import subprocess
 import pytest
 
 from autobahn_sync import AutobahnSync, ConnectionRefusedError
@@ -11,7 +12,6 @@ START_CROSSBAR = not pytest.config.getoption("--no-router")
 
 @pytest.fixture(scope="module")
 def crossbar(request):
-    import subprocess
     if START_CROSSBAR:
         # Start a wamp router
         subprocess.Popen(["crossbar", "start", "--cbdir", CROSSBAR_CONF_DIR])
