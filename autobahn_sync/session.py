@@ -12,8 +12,8 @@ __all__ = ('AsyncSession', 'SyncSession')
 
 
 class AsyncSession(ApplicationSession):
-    """
-    Custom ApplicationSession to get notified of ABORT message
+    """Custom :class:`autobahn.twisted.wamp.ApplicationSession` to get
+    notified of ABORT messages
     """
 
     def __init__(self, config=None):
@@ -37,20 +37,21 @@ class AsyncSession(ApplicationSession):
 
 
 class SyncSession(object):
-    """Synchronous subclass of :class:`autobahn.twisted.wamp._ApplicationSession`.
+    """Synchronous version of :class:`autobahn.twisted.wamp.ApplicationSession`
     """
 
     def __init__(self, async_session, callbacks_runner):
         self._async_session = async_session
         self._callbacks_runner = callbacks_runner
 
-    # @crochet.wait_for(timeout=30)
-    # def disconnect(self):
-    #     """Call a remote procedure.
+    @crochet.wait_for(timeout=30)
+    def leave(self, reason=None, message=None):
+        """Actively close this WAMP session.
 
-    #     Replace :meth:`autobahn.wamp.interface.IApplicationSession.disconnect`
-    #     """
-    #     return super(AutobahnSyncSession, self).disconnect()
+        Replace :meth:`autobahn.wamp.interface.IApplicationSession.leave`
+        """
+        # see https://github.com/crossbario/autobahn-python/issues/605
+        return self._async_session.leave(reason=reason, log_message=message)
 
     @crochet.wait_for(timeout=30)
     def call(self, procedure, *args, **kwargs):

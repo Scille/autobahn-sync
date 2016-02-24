@@ -77,15 +77,15 @@
                      ]
                   }
                ],
-"store": {
-   "type": "memory",
-   "event-history": [
-      {
-         "uri": "com.historized.event",
-         "limit": 10000
-      }
-   ]
-}
+               "store": {
+                  "type": "memory",
+                  "event-history": [
+                     {
+                        "uri": "rpc.historized.event",
+                        "limit": 10000
+                     }
+                  ]
+               }
             }
          ],
          "transports": [

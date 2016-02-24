@@ -31,10 +31,10 @@ class TestBadRouter(object):
         def on_event(*args, **kwargs):
             events.append((args, kwargs))
 
-        sub = wamp2.session.subscribe(on_event, 'com.app.event')
-        ret = wamp.session.publish('com.app.event', '1')
-        ret = wamp.session.publish('com.app.event', '2')
-        ret = wamp.session.publish('com.app.event', opt=True)
+        sub = wamp2.session.subscribe(on_event, 'pubsub.use_session.event')
+        ret = wamp.session.publish('pubsub.use_session.event', '1')
+        ret = wamp.session.publish('pubsub.use_session.event', '2')
+        ret = wamp.session.publish('pubsub.use_session.event', opt=True)
         sleep(0.1)  # Dirty way to wait for on_event to be called...
         assert events == [(('1',), {}), (('2',), {}), ((), {'opt': True})]
 
@@ -45,38 +45,39 @@ class TestBadRouter(object):
             events.append((args, kwargs))
 
         publish_opt = PublishOptions(exclude_me=False)
-        sub = wamp.session.subscribe(on_event, 'com.app.event')
-        ret = wamp.session.publish('com.app.event', '1', options=publish_opt)
-        ret = wamp.session.publish('com.app.event', '2', options=publish_opt)
-        ret = wamp.session.publish('com.app.event', opt=True, options=publish_opt)
+        sub = wamp.session.subscribe(on_event, 'pubsub.single_wamp_use_session.event')
+        ret = wamp.session.publish('pubsub.single_wamp_use_session.event', '1', options=publish_opt)
+        ret = wamp.session.publish('pubsub.single_wamp_use_session.event', '2', options=publish_opt)
+        ret = wamp.session.publish('pubsub.single_wamp_use_session.event', opt=True, options=publish_opt)
         sleep(0.1)  # Dirty way to wait for on_event to be called...
         assert events == [(('1',), {}), (('2',), {}), ((), {'opt': True})]
 
     def test_use_decorator(self, wamp):
         events = []
 
-        @wamp.subscribe('com.app.event')
+        @wamp.subscribe('pubsub.use_decorator.event')
         def on_event(*args, **kwargs):
             events.append((args, kwargs))
 
         publish_opt = PublishOptions(exclude_me=False)
-        ret = wamp.session.publish('com.app.event', '1', options=publish_opt)
-        ret = wamp.session.publish('com.app.event', '2', options=publish_opt)
-        ret = wamp.session.publish('com.app.event', opt=True, options=publish_opt)
+        ret = wamp.session.publish('pubsub.use_decorator.event', '1', options=publish_opt)
+        ret = wamp.session.publish('pubsub.use_decorator.event', '2', options=publish_opt)
+        ret = wamp.session.publish('pubsub.use_decorator.event', opt=True, options=publish_opt)
         sleep(0.1)  # Dirty way to wait for on_event to be called...
         assert events == [(('1',), {}), (('2',), {}), ((), {'opt': True})]
 
-    @pytest.mark.xfail(reason='Need lazy decorator registration first')
     def test_decorate_before_run(self, crossbar):
+        events = []
         wamp = AutobahnSync()
 
-        @wamp.subscribe('com.app.event')
+        @wamp.subscribe('pubsub.decorate_before_run.event')
         def on_event(*args, **kwargs):
             events.append((args, kwargs))
 
         wamp.run()
         publish_opt = PublishOptions(exclude_me=False)
-        ret = wamp.session.publish('com.app.event', 1, options=publish_opt)
-        ret = wamp.session.publish('com.app.event', '2', options=publish_opt)
-        ret = wamp.session.publish('com.app.event', opt=True, options=publish_opt)
-        assert events == [1, '2', True]
+        ret = wamp.session.publish('pubsub.decorate_before_run.event', '1', options=publish_opt)
+        ret = wamp.session.publish('pubsub.decorate_before_run.event', '2', options=publish_opt)
+        ret = wamp.session.publish('pubsub.decorate_before_run.event', opt=True, options=publish_opt)
+        sleep(0.1)  # Dirty way to wait for on_event to be called...
+        assert events == [(('1',), {}), (('2',), {}), ((), {'opt': True})]

@@ -9,11 +9,11 @@ Autobahn-Sync exposes an initialized :class:`autobahn_sync.AutobahnSync` at the
 root of the module as a quick&easy access to the API::
 
     import autobahn_sync
-    autobahn_sync.start(url=MY_ROUTER_URL, realm=MY_REALM)
+    autobahn_sync.run(url=MY_ROUTER_URL, realm=MY_REALM)
 
     @autobahn_sync.subscribe('com.app.event')
     def on_event(e):
-        pass
+        print('%s happened' % e)
 
     autobahn_sync.publish('com.app.event', 'trigger !')
 

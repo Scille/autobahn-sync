@@ -1,9 +1,10 @@
+from functools import partial
 import crochet
-from autobahn.twisted.wamp import Application, ApplicationRunner
+from autobahn.twisted.wamp import ApplicationRunner
 from twisted.internet import defer, threads
 
 from .logger import logger
-from .exceptions import AlreadyRunningError
+from .exceptions import AlreadyRunningError, NotRunningError
 from .session import SyncSession, AsyncSession
 from .callbacks_runner import CallbacksRunner, ThreadedCallbacksRunner
 
@@ -27,63 +28,66 @@ def _init_crochet(in_twisted=False):
     crochet_initialized = True
 
 
-# class ErrorCollector(object):
-#     def check(self):
-#         raise NotImplementedError()
-
-
-# class InTwistedErrorCollector(ErrorCollector):
-#     def __call__(self, failure):
-#         raise failure.value
-
-#     def check(self):
-#         pass
-
-
 class AutobahnSync(object):
+    """
+    Main class representing the AutobahnSync application
+    """
 
     def __init__(self, prefix=None):
         self.session = None
-        self._async_app = Application(prefix=prefix)
         self._async_runner = None
         self._async_session = None
         self._started = False
-        self._error_collector_cls = None
         self._callbacks_runner = None
+        self._on_running_callbacks = []
 
-    def run_in_twisted(self, callback, url=DEFAULT_AUTOBAHN_ROUTER,
+    def run_in_twisted(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER,
                        realm=DEFAULT_AUTOBAHN_REALM, blocking=False, **kwargs):
         """
+        Start the WAMP connection. Given we cannot run synchronous stuff inside the
+        twisted thread, use this function to do the initialization from a spawned
+        thread.
+
+        :param callback: function that will be called inside the spawned thread.
+        Put the rest of you init (or you main loop if you have one) inside it
+
+        .. note:: This function must be called instead of :meth:`AutobahnSync.run`
+        if we are calling from twisted application (typically if we are running
+        our application inside crossbar as a `wsgi` component)
         """
         _init_crochet(in_twisted=True)
         logger.debug('run_in_crossbar, bootstraping')
 
         def bootstrap_and_callback():
             self._bootstrap(blocking, url=url, realm=realm, **kwargs)
-            callback()
+            if callback:
+                callback()
 
         threads.deferToThread(bootstrap_and_callback)
 
     def run(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
             blocking=False, **kwargs):
-        """Start the background twisted thread and create the wamp connection
+        """
+        Start the background twisted thread and create the wamp connection
 
-        .. note:: This function must be called first
+        :param blocking: If ``False`` (default) this method will spawn a new
+        thread that will be used to run the callback events (e.i. registered and
+        subscribed functions). If ``True`` this method will not returns and
+        use the current thread to run the callbacks.
         """
         _init_crochet(in_twisted=False)
         self._bootstrap(blocking, url=url, realm=realm, **kwargs)
 
     def stop(self):
-        if not self._started:
-            raise AlreadyRunningError("This AutobahnSync instance is not started")
-        self._callbacks_runner.stop()
+        """
+        Terminate the WAMP session
 
-    # def _in_twisted_start(self, **kwargs):
-    #     threads.deferToThread(partial(self._out_twisted_start, **kwargs))
-        # self._error_collector_cls = InTwistedErrorCollector
-        # self._async_runner = ApplicationRunner(**kwargs)
-        # d = self._async_runner.run(self._async_app, start_reactor=False)
-        # d.addErrback(self._error_collector_cls())
+        .. note:: If the :meth:`AutobahnSync.run` has been run with ``blocking=True``,
+        it will returns then.
+        """
+        if not self._started:
+            raise NotRunningError("This AutobahnSync instance is not started")
+        self._callbacks_runner.stop()
 
     def _bootstrap(self, blocking, **kwargs):
         if self._started:
@@ -93,6 +97,9 @@ class AutobahnSync(object):
             self._callbacks_runner = CallbacksRunner()
         else:
             self._callbacks_runner = ThreadedCallbacksRunner()
+        for cb in self._on_running_callbacks:
+            self._callbacks_runner.put(cb)
+        self._on_running_callbacks = []
 
         @crochet.wait_for(timeout=30)
         def start_runner():
@@ -133,19 +140,35 @@ class AutobahnSync(object):
         self._callbacks_runner.start()
 
     def register(self, procedure=None, options=None):
-        "Decorator for the register"
-        assert self.session
+        "Decorator for the :meth:`AutobahnSync.session.register`"
 
         def decorator(func):
-            self.session.register(endpoint=func, procedure=procedure, options=options)
+            if self._started:
+                self.session.register(endpoint=func, procedure=procedure, options=options)
+            else:
+
+                def registerer():
+                    self.session.register(endpoint=func, procedure=procedure, options=options)
+
+                # Wait for the WAMP session to be started
+                self._on_running_callbacks.append(registerer)
+            return func
 
         return decorator
 
     def subscribe(self, topic, options=None):
-        "Decorator for the subscribe"
-        assert self.session
+        "Decorator for the :meth:`AutobahnSync.session.subscribe`"
 
         def decorator(func):
-            self.session.subscribe(handler=func, topic=topic, options=options)
+            if self._started:
+                self.session.subscribe(handler=func, topic=topic, options=options)
+            else:
+
+                def subscriber():
+                    self.session.subscribe(handler=func, topic=topic, options=options)
+
+                # Wait for the WAMP session to be started
+                self._on_running_callbacks.append(subscriber)
+            return func
 
         return decorator

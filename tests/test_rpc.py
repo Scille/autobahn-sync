@@ -35,24 +35,24 @@ class TestRPC(object):
 
     def test_history(self, wamp):
         # First create some stuff in the history
-        ret = wamp.session.publish('com.historized.event', 1)
-        ret = wamp.session.publish('com.historized.event', '2')
-        ret = wamp.session.publish('com.historized.event', args=True)
+        ret = wamp.session.publish('rpc.historized.event', 1)
+        ret = wamp.session.publish('rpc.historized.event', '2')
+        ret = wamp.session.publish('rpc.historized.event', args=True)
 
         # Arriving too late to get notified of the events...
-        sub = wamp.session.subscribe(lambda: None, 'com.historized.event')
+        sub = wamp.session.subscribe(lambda: None, 'rpc.historized.event')
         # ...but history is here for this !
         events = wamp.session.call('wamp.subscription.get_events', sub.id, 3)
 
         assert len(events) == 3
-        assert not [e for e in events if e[u'topic'] != u'com.historized.event']
+        assert not [e for e in events if e[u'topic'] != u'rpc.historized.event']
         assert [e[u'kwargs'] for e in events] == [{'args': True}, None, None]
         assert [e[u'args'] for e in events] == [[], ['2'], [1]]
 
     @pytest.mark.skipif("sys.version_info >= (3,0)", reason="Autobahn bug with Python3 encoding")
     def test_bad_history(self, wamp):
         # Cannot get history on this one, should raise exception then
-        sub = wamp.session.subscribe(lambda: None, 'com.not_historized.event')
+        sub = wamp.session.subscribe(lambda: None, 'rpc.not_historized.event')
         with pytest.raises(ApplicationError) as exc:
             events = wamp.session.call('wamp.subscription.get_events', sub.id, 10)
         assert str(exc.value.error_message()) == u'wamp.error.history_unavailable: '
@@ -60,21 +60,21 @@ class TestRPC(object):
     def test_use_session(self, wamp, wamp2):
         rets = []
         counter_func = CounterHelper()
-        sub = wamp2.session.register(counter_func, 'com.use_session.func')
-        rets.append(wamp.session.call('com.use_session.func'))
-        rets.append(wamp.session.call('com.use_session.func'))
-        rets.append(wamp.session.call('com.use_session.func'))
+        sub = wamp2.session.register(counter_func, 'rpc.use_session.func')
+        rets.append(wamp.session.call('rpc.use_session.func'))
+        rets.append(wamp.session.call('rpc.use_session.func'))
+        rets.append(wamp.session.call('rpc.use_session.func'))
         assert rets == [1, 2, 3]
 
     def test_unregister(self, wamp, wamp2):
-        reg = wamp2.session.register(lambda: None, 'com.unregister.func')
-        wamp.session.call('com.unregister.func')
+        reg = wamp2.session.register(lambda: None, 'rpc.unregister.func')
+        wamp.session.call('rpc.unregister.func')
         # reg.unregister()  # Cannot use the default API so far...
         wamp.session.unregister(reg)
         # with pytest.raises():
         with pytest.raises(ApplicationError) as exc:
-            wamp.session.call('com.unregister.func')
-        assert str(exc.value.args[0]) == u'no callee registered for procedure <com.unregister.func>'
+            wamp.session.call('rpc.unregister.func')
+        assert str(exc.value.args[0]) == u'no callee registered for procedure <rpc.unregister.func>'
         # Cannot unregister 2 times
         with pytest.raises(Exception) as exc:
             wamp.session.unregister(reg)
@@ -83,37 +83,36 @@ class TestRPC(object):
     def test_single_wamp_use_session(self, wamp):
         rets = []
         counter_func = CounterHelper()
-        sub = wamp.session.register(counter_func, 'com.single_wamp_use_session.func')
-        rets.append(wamp.session.call('com.single_wamp_use_session.func'))
-        rets.append(wamp.session.call('com.single_wamp_use_session.func'))
-        rets.append(wamp.session.call('com.single_wamp_use_session.func'))
+        sub = wamp.session.register(counter_func, 'rpc.single_wamp_use_session.func')
+        rets.append(wamp.session.call('rpc.single_wamp_use_session.func'))
+        rets.append(wamp.session.call('rpc.single_wamp_use_session.func'))
+        rets.append(wamp.session.call('rpc.single_wamp_use_session.func'))
         assert rets == [1, 2, 3]
 
     def test_use_decorator(self, wamp):
         rets = []
         counter_func = CounterHelper()
 
-        @wamp.register(u'com.use_decorator.func')
+        @wamp.register(u'rpc.use_decorator.func')
         def my_func(*args, **kwargs):
             return counter_func()
 
-        rets.append(wamp.session.call('com.use_decorator.func'))
-        rets.append(wamp.session.call('com.use_decorator.func'))
-        rets.append(wamp.session.call('com.use_decorator.func'))
+        rets.append(wamp.session.call('rpc.use_decorator.func'))
+        rets.append(wamp.session.call('rpc.use_decorator.func'))
+        rets.append(wamp.session.call('rpc.use_decorator.func'))
         assert rets == [1, 2, 3]
 
-    @pytest.mark.xfail(reason='Need lazy decorator registration first')
     def test_decorate_before_run(self, crossbar):
         wamp = AutobahnSync()
         rets = []
         counter_func = CounterHelper()
 
-        @wamp.register('com.decorate_before_run.func')
+        @wamp.register('rpc.decorate_before_run.func')
         def my_func(*args, **kwargs):
             return counter_func()
 
         wamp.run()
-        rets.append(wamp.session.call('com.decorate_before_run.func'))
-        rets.append(wamp.session.call('com.decorate_before_run.func'))
-        rets.append(wamp.session.call('com.decorate_before_run.func'))
+        rets.append(wamp.session.call('rpc.decorate_before_run.func'))
+        rets.append(wamp.session.call('rpc.decorate_before_run.func'))
+        rets.append(wamp.session.call('rpc.decorate_before_run.func'))
         assert rets == [1, 2, 3]

@@ -31,3 +31,9 @@ class AlreadyRunningError(Error):
     """
     Error raised when trying to ``run()`` multiple time an :class:`autobahn_sync.AutobahnSync`
     """
+
+
+class NotRunningError(Error):
+    """
+    Error raised when trying to ``stop()`` multiple time an :class:`autobahn_sync.AutobahnSync`
+    """
