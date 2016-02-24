@@ -24,10 +24,21 @@ Advanced API
 With the need to connect to multiple realms/routers, the default API is not enought
 and you should create other instances of :class:`autobahn_sync.AutobahnSync`.
 
-.. automodule:: autobahn_sync
+.. automodule:: autobahn_sync.core
   :members:
-  :undoc-members:
 
+.. automodule:: autobahn_sync.session
+  :members:
+
+Exceptions
+----------
+
+.. note::
+    Most exceptions are republished from :mod:`autobahn.wamp.exception`
+    and :mod:`twisted.internet.error`
+
+.. automodule:: autobahn_sync.exceptions
+  :members:
 
 Flask extension
 ---------------

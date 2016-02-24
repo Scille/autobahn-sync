@@ -4,7 +4,7 @@ from twisted.internet import defer, threads
 
 from .logger import logger
 from .exceptions import AlreadyRunningError, NotRunningError
-from .session import SyncSession, AsyncSession
+from .session import SyncSession, _AsyncSession
 from .callbacks_runner import CallbacksRunner, ThreadedCallbacksRunner
 
 
@@ -33,12 +33,21 @@ class AutobahnSync(object):
     """
 
     def __init__(self, prefix=None):
-        self.session = None
+        self._session = None
         self._async_runner = None
         self._async_session = None
         self._started = False
         self._callbacks_runner = None
         self._on_running_callbacks = []
+
+    @property
+    def session(self):
+        """Return the underlying :class:`session.SyncSession`
+        object if available or raise an :class:`exceptions.NotRunningError`
+        """
+        if not self._session:
+            raise NotRunningError("No session available, is AutobahnSync running ?")
+        return self._session
 
     def run_in_twisted(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER,
                        realm=DEFAULT_AUTOBAHN_REALM, blocking=False, **kwargs):
@@ -47,12 +56,14 @@ class AutobahnSync(object):
         twisted thread, use this function to do the initialization from a spawned
         thread.
 
+        :param blocking: see :meth:`AutobahnSync.run`
         :param callback: function that will be called inside the spawned thread.
         Put the rest of you init (or you main loop if you have one) inside it
 
-        .. note:: This function must be called instead of :meth:`AutobahnSync.run`
-        if we are calling from twisted application (typically if we are running
-        our application inside crossbar as a `wsgi` component)
+        .. note::
+            This function must be called instead of :meth:`AutobahnSync.run`
+            if we are calling from twisted application (typically if we are running
+            our application inside crossbar as a `wsgi` component)
         """
         _init_crochet(in_twisted=True)
         logger.debug('run_in_crossbar, bootstraping')
@@ -81,8 +92,9 @@ class AutobahnSync(object):
         """
         Terminate the WAMP session
 
-        .. note:: If the :meth:`AutobahnSync.run` has been run with ``blocking=True``,
-        it will returns then.
+        .. note::
+            If the :meth:`AutobahnSync.run` has been run with ``blocking=True``,
+            it will returns then.
         """
         if not self._started:
             raise NotRunningError("This AutobahnSync instance is not started")
@@ -107,8 +119,8 @@ class AutobahnSync(object):
 
             def register_session(config):
                 logger.debug('[CrochetReactor] start register_session')
-                self._async_session = AsyncSession(config=config)
-                self.session = SyncSession(self._async_session, self._callbacks_runner)
+                self._async_session = _AsyncSession(config=config)
+                self._session = SyncSession(self._async_session, self._callbacks_runner)
 
                 def resolve(result):
                     logger.debug('[CrochetReactor] callback resolve: %s' % result)
@@ -141,8 +153,9 @@ class AutobahnSync(object):
     def register(self, procedure=None, options=None):
         """Decorator for the :meth:`AutobahnSync.session.register`
 
-        .. note:: This decorator can be used before :meth:`AutobahnSync.run` is called.
-        In such case the actual registration will be done at ``run()`` time.
+        .. note::
+            This decorator can be used before :meth:`AutobahnSync.run` is called.
+            In such case the actual registration will be done at ``run()`` time.
         """
 
         def decorator(func):
@@ -162,8 +175,9 @@ class AutobahnSync(object):
     def subscribe(self, topic, options=None):
         """Decorator for the :meth:`AutobahnSync.session.subscribe`
 
-        .. note:: This decorator can be used before :meth:`AutobahnSync.run` is called.
-        In such case the actual registration will be done at ``run()`` time.
+        .. note::
+            This decorator can be used before :meth:`AutobahnSync.run` is called.
+            In such case the actual registration will be done at ``run()`` time.
         """
 
         def decorator(func):

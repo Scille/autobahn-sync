@@ -8,16 +8,16 @@ from .exceptions import AbortError
 from .logger import logger
 
 
-__all__ = ('AsyncSession', 'SyncSession')
+__all__ = ('_AsyncSession', 'SyncSession')
 
 
-class AsyncSession(ApplicationSession):
+class _AsyncSession(ApplicationSession):
     """Custom :class:`autobahn.twisted.wamp.ApplicationSession` to get
     notified of ABORT messages
     """
 
     def __init__(self, config=None):
-        super(AsyncSession, self).__init__(config=config)
+        super(_AsyncSession, self).__init__(config=config)
         self.on_join_defer = defer.Deferred()
 
     def onMessage(self, msg):
@@ -29,11 +29,11 @@ class AsyncSession(ApplicationSession):
             else:
                 logger.debug('Received WELCOME answer to our HELLO: %s' % msg)
                 self.on_join_defer.callback(msg)
-        return super(AsyncSession, self).onMessage(msg)
+        return super(_AsyncSession, self).onMessage(msg)
 
     def onUserError(self, fail, msg):
         logger.error('%s\n%s' % (msg, fail.getTraceback()))
-        super(AsyncSession, self).onUserError(fail, msg)
+        super(_AsyncSession, self).onUserError(fail, msg)
 
 
 class SyncSession(object):

@@ -9,9 +9,10 @@ First start crossbar
 .. code-block:: sh
     $ crossbar start
 
-.. note:: crossbar configuration use "reverseproxy" option which is only available
-in crossbar>v0.12.1, with lower version you can remove this configuration and
-use http://localhost:8081/ to access the example
+.. note::
+    crossbar configuration use "reverseproxy" option which is only available
+    in crossbar>v0.12.1, with lower version you can remove this configuration and
+    use http://localhost:8081/ to access the example
 
 
 Then launch the app, to do so you have the choice between "dev mode":
@@ -23,8 +24,9 @@ Then launch the app, to do so you have the choice between "dev mode":
      * Debugger is active!
      * Debugger pin code: 230-774-136
 
-.. note:: Given Autobahn-Sync makes use of threads, flask's autoreload function
-is kind of buggy and should not be used (yeah, that sucks...)
+.. note::
+    Given Autobahn-Sync makes use of threads, flask's autoreload function
+    is kind of buggy and should not be used (yeah, that sucks...)
 
 
 or "production mode" with Gunicorn running the app on 4 concurrent workers:
