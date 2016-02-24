@@ -1,4 +1,3 @@
-from functools import partial
 import crochet
 from autobahn.twisted.wamp import ApplicationRunner
 from twisted.internet import defer, threads
