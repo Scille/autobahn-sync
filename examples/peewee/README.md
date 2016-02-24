@@ -9,11 +9,16 @@ The application is divided into two parts:
 
 First start crossbar
 
+```sh
     $ crossbar start
+```
+
 
 Then start the app in another terminal, given the backend part is already running
 with crossbar, use ``--repl`` option to only run the terminal.
 
+```sh
     $ python app.py --repl
     Welcome to the book shell, type `help` if you're lost
     > 
+```
