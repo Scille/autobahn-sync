@@ -140,7 +140,11 @@ class AutobahnSync(object):
         self._callbacks_runner.start()
 
     def register(self, procedure=None, options=None):
-        "Decorator for the :meth:`AutobahnSync.session.register`"
+        """Decorator for the :meth:`AutobahnSync.session.register`
+
+        .. note:: This decorator can be used before :meth:`AutobahnSync.run` is called.
+        In such case the actual registration will be done at ``run()`` time.
+        """
 
         def decorator(func):
             if self._started:
@@ -157,7 +161,11 @@ class AutobahnSync(object):
         return decorator
 
     def subscribe(self, topic, options=None):
-        "Decorator for the :meth:`AutobahnSync.session.subscribe`"
+        """Decorator for the :meth:`AutobahnSync.session.subscribe`
+
+        .. note:: This decorator can be used before :meth:`AutobahnSync.run` is called.
+        In such case the actual registration will be done at ``run()`` time.
+        """
 
         def decorator(func):
             if self._started:
