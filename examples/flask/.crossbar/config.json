@@ -36,9 +36,10 @@
                   "port": 8080
                },
                "paths": {
-                  "touille": {
-                     "type": "redirect",
-                     "url": "127.0.0.1:8081/"
+                  "/": {
+                     "type": "reverseproxy",
+                     "host": "localhost",
+                     "port": 8081
                   },
                   "ws": {
                      "type": "websocket"
