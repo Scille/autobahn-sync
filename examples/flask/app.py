@@ -20,7 +20,7 @@ def bootstrap():
         print('[Worker %s] Received %s' % (worker_id, data))
         serve_history.append(data)
 
-    # Authorize multiple registers given we can start this app in workers
+    # Authorize multiple registers given we can start this app in concurrent workers
     register_opt = RegisterOptions(invoke=u'random')
     @wamp.register(u'com.flask_app.get_request_history', options=register_opt)
     def get_request_history(wid):

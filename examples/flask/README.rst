@@ -27,7 +27,7 @@ Then launch the app, to do so you have the choice between "dev mode":
 is kind of buggy and should not be used (yeah, that sucks...)
 
 
-or "production mode" with gunicorn:
+or "production mode" with Gunicorn running the app on 4 concurrent workers:
 
 .. code-block:: sh
     $ ./runserver.sh
