@@ -19,9 +19,7 @@ Quick example
 
 .. code-block:: python
 
-    from autobahn_sync import publish, call, register, subscribe, start
-
-    start()
+    from autobahn_sync import publish, call, register, subscribe, run
 
 
     @register('com.app.shout')
@@ -34,12 +32,13 @@ Quick example
         print("I've just had a new idea: %s" % msg)
 
 
+    run()
     print(call('com.app.shout', 'Autobahn is cool !'))
     publish('com.app.idea', 'Use autobahn everywhere !')
 
 
 This code will connect to the crossbar router (don't forget to start it
-before trying this snippet !) listenening ``ws://127.0.0.1:8080/ws``
+before trying this snippet !) listening ``ws://127.0.0.1:8080/ws``
 and register itself in realm ``realm1``.
 
 Also see the `examples <https://github.com/Scille/autobahn_sync/blob/master/examples>`_ for more usecases
