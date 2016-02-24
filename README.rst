@@ -15,7 +15,7 @@ Autobahn~Sync
 
 `Autobahn <http://autobahn.ws>`_ integration with `crochet <https://github.com/itamarst/crochet>`_ to provide WAMP for synchronous applications.
 
-Originaly based on the work of `Sam & Max <http://sametmax.com/les-managers-le-detestent-faites-tourner-wamp-dans-django-avec-cette-astuce-insolite/>`_.
+Originaly based on the work of `Sam & Max <http://sametmax.com/les-managers-le-detestent-faites-tourner-wamp-dans-django-avec-cette-astuce-insolite/>`_ (warning: French, pr0n and awesomeness inside !).
 
 Quick example
 -------------

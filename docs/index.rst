@@ -6,6 +6,18 @@
 Welcome to Autobahn-Sync's documentation !
 ==========================================
 
+.. image:: https://travis-ci.org/Scille/autobahn-sync.svg?branch=master
+    :target: https://travis-ci.org/Scille/autobahn-sync
+    :alt: Travis-CI
+
+.. image:: https://coveralls.io/repos/github/Scille/autobahn-sync/badge.svg?branch=master
+    :target: https://coveralls.io/github/Scille/autobahn-sync?branch=master
+    :alt: Code coverage
+
+.. image:: https://readthedocs.org/projects/autobahn-sync/badge/?version=latest
+    :target: http://autobahn-sync.readthedocs.org/en/latest/?badge=latest
+    :alt: Documentation Status
+
 `Autobahn <http://autobahn.ws>`_ integration with `crochet <https://github.com/itamarst/crochet>`_ to provide WAMP for synchronous applications.
 
 Originally based on the work of `Sam & Max <http://sametmax.com/les-managers-le-detestent-faites-tourner-wamp-dans-django-avec-cette-astuce-insolite/>`_ (warning: French, pr0n and awesomeness inside !).
