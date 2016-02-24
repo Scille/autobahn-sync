@@ -17,7 +17,8 @@ __all__ = (
     'ConnectionRefusedError',
 
     'AbortError',
-    'AlreadyRunningError'
+    'AlreadyRunningError',
+    'NotRunningError'
 )
 
 

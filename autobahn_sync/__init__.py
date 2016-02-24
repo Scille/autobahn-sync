@@ -3,7 +3,7 @@ from .exceptions import (
     Error, SessionNotReady, SerializationError, ProtocolError,
     TransportLost, ApplicationError, NotAuthorized, InvalidUri,
     ConnectionRefusedError,
-    AbortError, AlreadyRunningError
+    AbortError, AlreadyRunningError, NotRunningError
 )
 from .api import app, run, register, subscribe, call, publish
 
@@ -22,6 +22,7 @@ __all__ = (
 
     AbortError,
     AlreadyRunningError,
+    NotRunningError,
 
     DEFAULT_AUTOBAHN_ROUTER,
     DEFAULT_AUTOBAHN_REALM,
