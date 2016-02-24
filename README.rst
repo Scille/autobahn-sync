@@ -2,10 +2,13 @@
     :target: https://travis-ci.org/Scille/autobahn-sync
     :alt: Travis-CI
 
+.. image:: https://coveralls.io/repos/github/Scille/autobahn-sync/badge.svg?branch=master
+    :target: https://coveralls.io/github/Scille/autobahn-sync?branch=master
+    :alt: Code coverage
+
 .. image:: https://readthedocs.org/projects/autobahn-sync/badge/?version=latest
     :target: http://autobahn-sync.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
-
 
 Autobahn~Sync
 =============
