@@ -108,9 +108,6 @@ class AutobahnSync(object):
             self._callbacks_runner = CallbacksRunner()
         else:
             self._callbacks_runner = ThreadedCallbacksRunner()
-        for cb in self._on_running_callbacks:
-            self._callbacks_runner.put(cb)
-        self._on_running_callbacks = []
 
         @crochet.wait_for(timeout=30)
         def start_runner():
@@ -148,6 +145,11 @@ class AutobahnSync(object):
 
         logger.debug('[MainThread] call bootstrap')
         start_runner()
+        logger.debug('[MainThread] call decorated register/subscribe')
+        for cb in self._on_running_callbacks:
+            cb()
+        self._on_running_callbacks = []
+        logger.debug('[MainThread] start callbacks runner')
         self._callbacks_runner.start()
 
     def register(self, procedure=None, options=None):
