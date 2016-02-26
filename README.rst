@@ -22,6 +22,7 @@ Quick example
 
 .. code-block:: python
 
+    from time import sleep
     from autobahn_sync import publish, call, register, subscribe, run
 
 
@@ -36,8 +37,10 @@ Quick example
 
 
     run()
-    print(call('com.app.shout', 'Autobahn is cool !'))
-    publish('com.app.idea', 'Use autobahn everywhere !')
+    while True:
+        print(call('com.app.shout', 'Autobahn is cool !'))
+        publish('com.app.idea', 'Use autobahn everywhere !')
+        sleep(1)
 
 
 This code will connect to the crossbar router (don't forget to start it
