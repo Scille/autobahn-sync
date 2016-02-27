@@ -13,17 +13,17 @@ class TestBadRouter(object):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
         with pytest.raises(ApplicationError) as exc:
-            wamp.session.subscribe(lambda: None, 'test.no_subscribe.event')
-        assert str(exc.value.args[0]) == "session is not authorized to subscribe to topic 'test.no_subscribe.event'"
+            wamp.session.subscribe(lambda: None, 'pubsub.no_subscribe.event')
+        assert str(exc.value.args[0]) == "session is not authorized to subscribe to topic 'pubsub.no_subscribe.event'"
 
-    @pytest.mark.xfail(reason='Must inverstigate in crossbar code...')
     def test_no_publish(self, crossbar):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
-        wamp.session.subscribe(lambda: None, 'test.no_publish.event')
-        with pytest.raises(ApplicationError):
-            wamp.session.publish(u'test.no_publish.event', None)
-        assert str(exc.value.args[0]) == u"session is not authorized to publish to topic'test.no_publish.event'"
+        wamp.session.subscribe(lambda: None, 'pubsub.no_publish.event')
+        publish_opt = PublishOptions(acknowledge=True)
+        with pytest.raises(ApplicationError) as exc:
+            res = wamp.session.publish(u'pubsub.no_publish.event', None, options=publish_opt)
+        assert str(exc.value.args[0]) == u"session not authorized to publish to topic 'pubsub.no_publish.event'"
 
     def test_use_session(self, wamp, wamp2):
         events = []

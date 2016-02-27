@@ -21,17 +21,16 @@ class TestRPC(object):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
         with pytest.raises(ApplicationError) as exc:
-            wamp.session.register(lambda: None, u'test.no_register.func')
-        assert str(exc.value.args[0]) == u"session is not authorized to register procedure 'test.no_register.func'"
+            wamp.session.register(lambda: None, u'rpc.no_register.func')
+        assert str(exc.value.args[0]) == u"session is not authorized to register procedure 'rpc.no_register.func'"
 
-    @pytest.mark.xfail(reason='Must inverstigate in crossbar code...')
     def test_no_call(self, crossbar):
         wamp = AutobahnSync()
         wamp.run(realm=u'realm_limited')
-        wamp.session.register(lambda: None, u'test.no_call.func')
+        wamp.session.register(lambda: None, u'rpc.no_call.func')
         with pytest.raises(ApplicationError) as exc:
-            wamp.session.call(u'test.no_call.func', None)
-        assert str(exc.value.args[0]) == u"session is not authorized to call procedure 'test.no_register.func'"
+            wamp.session.call(u'rpc.no_call.func', None)
+        assert str(exc.value.args[0]) == u"session is not authorized to call procedure 'rpc.no_call.func'"
 
     def test_history(self, wamp):
         # First create some stuff in the history

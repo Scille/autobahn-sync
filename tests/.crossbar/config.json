@@ -15,43 +15,28 @@
                      "name": "anonymous",
                      "permissions": [
                         {
-                           "uri": "test.no_publish.*",
+                           "uri": "pubsub.no_publish.*",
                            "publish": false,
                            "subscribe": true,
                            "call": true,
                            "register": true
-                        }
-                     ]
-                  },
-                  {
-                     "name": "anonymous",
-                     "permissions": [
+                        },
                         {
-                           "uri": "test.no_subscribe.*",
+                           "uri": "pubsub.no_subscribe.*",
                            "publish": true,
                            "subscribe": false,
                            "call": true,
                            "register": true
-                        }
-                     ]
-                  },
-                  {
-                     "name": "anonymous",
-                     "permissions": [
+                        },
                         {
-                           "uri": "test.no_call.*",
+                           "uri": "rpc.no_call.*",
                            "publish": true,
                            "subscribe": true,
                            "call": false,
                            "register": true
-                        }
-                     ]
-                  },
-                  {
-                     "name": "anonymous",
-                     "permissions": [
+                        },
                         {
-                           "uri": "test.no_register.*",
+                           "uri": "rpc.no_register.*",
                            "publish": true,
                            "subscribe": true,
                            "call": true,
