@@ -48,7 +48,6 @@ class TestRPC(object):
         assert [e[u'kwargs'] for e in events] == [{'args': True}, None, None]
         assert [e[u'args'] for e in events] == [[], ['2'], [1]]
 
-    @pytest.mark.skipif("sys.version_info >= (3,0)", reason="Autobahn bug with Python3 encoding")
     def test_bad_history(self, wamp):
         # Cannot get history on this one, should raise exception then
         sub = wamp.session.subscribe(lambda: None, 'rpc.not_historized.event')
