@@ -92,3 +92,7 @@ class SyncSession(object):
         def proxy_handler(*args, **kwargs):
             return self._callbacks_runner.put(partial(handler, *args, **kwargs))
         return self._async_session.subscribe(proxy_handler, topic=topic, options=options)
+
+    @crochet.wait_for(timeout=30)
+    def unsubscribe(self, subscription):
+        return subscription.unsubscribe()

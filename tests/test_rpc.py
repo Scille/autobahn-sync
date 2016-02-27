@@ -56,6 +56,14 @@ class TestRPC(object):
             events = wamp.session.call('wamp.subscription.get_events', sub.id, 10)
         assert str(exc.value.error_message()) == u'wamp.error.history_unavailable: '
 
+    def test_history_on_unsubscribed(self, wamp):
+        # Cannot get history on this one, should raise exception then
+        sub = wamp.session.subscribe(lambda: None, 'rpc.historized.event')
+        wamp.session.unsubscribe(sub)
+        with pytest.raises(ApplicationError) as exc:
+            events = wamp.session.call('wamp.subscription.get_events', sub.id, 10)
+        assert exc.value.error == u'wamp.error.no_such_subscription'
+
     def test_use_session(self, wamp, wamp2):
         rets = []
         counter_func = CounterHelper()

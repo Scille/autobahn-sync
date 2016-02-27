@@ -38,6 +38,25 @@ class TestBadRouter(object):
         sleep(0.1)  # Dirty way to wait for on_event to be called...
         assert events == [(('1',), {}), (('2',), {}), ((), {'opt': True})]
 
+    def test_unsubscribe(self, wamp, wamp2):
+        events = []
+
+        def on_event(*args, **kwargs):
+            events.append((args, kwargs))
+
+        reg = wamp2.session.subscribe(on_event, 'pubsub.unsubscribe.event')
+        wamp.session.publish('pubsub.unsubscribe.event', '1')
+        # reg.unsubscribe()  # Cannot use the default API so far...
+        sleep(0.1)  # Dirty way to wait for on_event to be called...
+        wamp.session.unsubscribe(reg)
+        wamp.session.publish('pubsub.unsubscribe.event', '2')
+        sleep(0.1)  # Dirty way to wait for on_event to be called...
+        # Cannot unsubscribe 2 times
+        with pytest.raises(Exception) as exc:
+            wamp.session.unsubscribe(reg)
+        assert str(exc.value.args[0]) == 'subscription no longer active'
+        assert events == [(('1',), {})]
+
     def test_single_wamp_use_session(self, wamp):
         events = []
 
