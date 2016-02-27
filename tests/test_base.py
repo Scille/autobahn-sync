@@ -1,4 +1,5 @@
 import pytest
+from time import sleep
 
 from autobahn_sync import (
     AutobahnSync, ConnectionRefusedError, NotRunningError,
@@ -32,3 +33,16 @@ class Test(object):
         wamp.session.leave()
         with pytest.raises(TransportLost):
             wamp.session.publish('com.disconnect.no_realm')
+
+    def test_stop(self, crossbar):
+        wamp = AutobahnSync()
+        wamp.run()
+        wamp.session.publish('com.disconnect.ready')
+        wamp.session.leave()
+        wamp.stop()
+        sleep(0.1)  # Dirty way to wait for stop...
+        with pytest.raises(TransportLost):
+            wamp.session.publish('com.disconnect.no_realm')
+        with pytest.raises(NotRunningError) as exc:
+            wamp.stop()
+        assert str(exc.value.args[0]) == "This AutobahnSync instance is not started"

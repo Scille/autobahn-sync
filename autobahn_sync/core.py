@@ -99,6 +99,7 @@ class AutobahnSync(object):
         if not self._started:
             raise NotRunningError("This AutobahnSync instance is not started")
         self._callbacks_runner.stop()
+        self._started = False
 
     def _bootstrap(self, blocking, **kwargs):
         if self._started:

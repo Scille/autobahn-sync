@@ -3,7 +3,7 @@ import pytest
 from flask import Flask
 from time import sleep
 from autobahn_sync.extensions.flask import FlaskAutobahnSync
-from autobahn_sync import NotRunningError
+from autobahn_sync import NotRunningError, AbortError, ConnectionRefusedError
 from autobahn.wamp import PublishOptions
 
 from fixtures import crossbar, wamp
@@ -47,3 +47,10 @@ class TestFlask(object):
 
         assert self.rpc_called
         assert self.sub_called
+
+    def test_bad_config(self):
+        app = Flask(__name__)
+        with pytest.raises(AbortError):
+            wamp = FlaskAutobahnSync(app, realm=u'bad_realm')
+        with pytest.raises(ConnectionRefusedError):
+            wamp = FlaskAutobahnSync(app, router=u'ws://localhost:9999/missing')

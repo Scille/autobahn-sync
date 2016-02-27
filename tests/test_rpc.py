@@ -115,3 +115,14 @@ class TestRPC(object):
         rets.append(wamp.session.call('rpc.decorate_before_run.func'))
         rets.append(wamp.session.call('rpc.decorate_before_run.func'))
         assert rets == [1, 2, 3]
+
+    def test_on_exception(self, wamp):
+        class MyException(Exception):
+            pass
+
+        @wamp.register(u'rpc.on_exception.func')
+        def my_func(*args, **kwargs):
+            raise MyException('Ooops !')
+        with pytest.raises(ApplicationError) as exc:
+            wamp.session.call('rpc.on_exception.func')
+        assert str(exc.value.args[0]) == 'Ooops !'
