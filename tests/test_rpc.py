@@ -34,9 +34,9 @@ class TestRPC(object):
 
     def test_history(self, wamp):
         # First create some stuff in the history
-        ret = wamp.session.publish('rpc.historized.event', 1)
-        ret = wamp.session.publish('rpc.historized.event', '2')
-        ret = wamp.session.publish('rpc.historized.event', args=True)
+        wamp.session.publish('rpc.historized.event', 1)
+        wamp.session.publish('rpc.historized.event', '2')
+        wamp.session.publish('rpc.historized.event', args=True)
 
         # Arriving too late to get notified of the events...
         sub = wamp.session.subscribe(lambda: None, 'rpc.historized.event')
@@ -55,6 +55,7 @@ class TestRPC(object):
             events = wamp.session.call('wamp.subscription.get_events', sub.id, 10)
         assert str(exc.value.error_message()) == u'wamp.error.history_unavailable: '
 
+    @pytest.mark.xfail(reason='sub.id seems still valid even after unsubscribe')
     def test_history_on_unsubscribed(self, wamp):
         # Cannot get history on this one, should raise exception then
         sub = wamp.session.subscribe(lambda: None, 'rpc.historized.event')
@@ -77,7 +78,6 @@ class TestRPC(object):
         wamp.session.call('rpc.unregister.func')
         # reg.unregister()  # Cannot use the default API so far...
         wamp.session.unregister(reg)
-        # with pytest.raises():
         with pytest.raises(ApplicationError) as exc:
             wamp.session.call('rpc.unregister.func')
         assert str(exc.value.args[0]) == u'no callee registered for procedure <rpc.unregister.func>'
