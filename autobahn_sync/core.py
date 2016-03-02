@@ -80,12 +80,14 @@ class AutobahnSync(object):
     def run(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
             blocking=False, **kwargs):
         """
-        Start the background twisted thread and create the wamp connection
+        Start the background twisted thread and create the WAMP connection
 
         :param blocking: If ``False`` (default) this method will spawn a new
         thread that will be used to run the callback events (e.i. registered and
         subscribed functions). If ``True`` this method will not returns and
         use the current thread to run the callbacks.
+        :param callback: This callback will be called once init is done, use it
+        with ``blocking=True`` to put your WAMP related init
         """
         _init_crochet(in_twisted=False)
         self._bootstrap(blocking, url=url, realm=realm, **kwargs)
@@ -107,6 +109,10 @@ class AutobahnSync(object):
         self._started = False
 
     def _bootstrap(self, blocking, **kwargs):
+        """Synchronous bootstrap (even if `blocking=False` is provided !)
+
+        Create the WAMP session and configure the `_callbacks_runner`.
+        """
         if self._started:
             raise AlreadyRunningError("This AutobahnSync instance is already started")
         self._started = True
