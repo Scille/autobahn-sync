@@ -28,6 +28,7 @@ def _init_crochet(in_twisted=False):
 
 
 class AutobahnSync(object):
+
     """
     Main class representing the AutobahnSync application
     """
@@ -72,10 +73,11 @@ class AutobahnSync(object):
             self._bootstrap(blocking, url=url, realm=realm, **kwargs)
             if callback:
                 callback()
+            self._callbacks_runner.start()
 
         threads.deferToThread(bootstrap_and_callback)
 
-    def run(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
+    def run(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
             blocking=False, **kwargs):
         """
         Start the background twisted thread and create the wamp connection
@@ -87,6 +89,9 @@ class AutobahnSync(object):
         """
         _init_crochet(in_twisted=False)
         self._bootstrap(blocking, url=url, realm=realm, **kwargs)
+        if callback:
+            callback()
+        self._callbacks_runner.start()
 
     def stop(self):
         """
@@ -151,7 +156,6 @@ class AutobahnSync(object):
             cb()
         self._on_running_callbacks = []
         logger.debug('[MainThread] start callbacks runner')
-        self._callbacks_runner.start()
 
     def register(self, procedure=None, options=None):
         """Decorator for the :meth:`AutobahnSync.session.register`
