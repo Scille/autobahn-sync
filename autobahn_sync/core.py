@@ -51,13 +51,12 @@ class AutobahnSync(object):
         return self._session
 
     def run_in_twisted(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER,
-                       realm=DEFAULT_AUTOBAHN_REALM, blocking=False, **kwargs):
+                       realm=DEFAULT_AUTOBAHN_REALM, **kwargs):
         """
         Start the WAMP connection. Given we cannot run synchronous stuff inside the
-        twisted thread, use this function to do the initialization from a spawned
-        thread.
+        twisted thread, use this function (which returns immediately) to do the
+        initialization from a spawned thread.
 
-        :param blocking: see :meth:`AutobahnSync.run`
         :param callback: function that will be called inside the spawned thread.
         Put the rest of you init (or you main loop if you have one) inside it
 
@@ -68,6 +67,8 @@ class AutobahnSync(object):
         """
         _init_crochet(in_twisted=True)
         logger.debug('run_in_crossbar, bootstraping')
+        # No need to go non-blocking if no callback has been provided
+        blocking = callback is None
 
         def bootstrap_and_callback():
             self._bootstrap(blocking, url=url, realm=realm, **kwargs)
