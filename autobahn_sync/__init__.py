@@ -36,5 +36,5 @@ __all__ = (
     publish
 )
 
-__version__ = "0.2.1"
+__version__ = "0.2.3"
 __license__ = 'MIT'
