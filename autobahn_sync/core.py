@@ -52,9 +52,9 @@ class AutobahnSync(object):
             raise NotRunningError("No session available, is AutobahnSync running ?")
         return self._session
 
-    def run(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
-            authmethods=None, authid=None, authrole=None, authextra=None,
-            callback=None, **kwargs):
+    def run_in_twisted(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
+                       authmethods=None, authid=None, authrole=None, authextra=None,
+                       callback=None, **kwargs):
         """
         Start the WAMP connection. Given we cannot run synchronous stuff inside the
         twisted thread, use this function (which returns immediately) to do the
@@ -63,10 +63,10 @@ class AutobahnSync(object):
         :param callback: function that will be called inside the spawned thread.
         Put the rest of you init (or you main loop if you have one) inside it
 
-        :param authmethods: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
-        :param authid: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
-        :param authrole: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
-        :param authextra: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authmethods: Passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authid: Passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authrole: Passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authextra: Passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
 
         .. note::
             This function must be called instead of :meth:`AutobahnSync.run`
@@ -238,5 +238,6 @@ class AutobahnSync(object):
         """
 
         if self._started:
-            raise RuntimeError("Cannot register a on_challenge callback once the session is started")
+            raise RuntimeError("Cannot register a on_challenge callback"
+                               " once the session is started")
         self._on_challenge_callback = func

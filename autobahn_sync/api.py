@@ -19,6 +19,7 @@ register = app.register
 subscribe = app.subscribe
 on_challenge = app.on_challenge
 
+
 def call(*args, **kwargs):
     if not app._started:
         raise NotRunningError("AutobahnSync not started, call `run` first")
