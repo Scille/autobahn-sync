@@ -5,7 +5,7 @@ from .exceptions import (
     ConnectionRefusedError,
     AbortError, AlreadyRunningError, NotRunningError
 )
-from .api import app, run, register, subscribe, call, publish
+from .api import app, run, register, subscribe, call, publish, on_challenge
 
 
 __all__ = (
@@ -33,7 +33,8 @@ __all__ = (
     register,
     subscribe,
     call,
-    publish
+    publish,
+    on_challenge
 )
 
 __version__ = "0.3.0"
