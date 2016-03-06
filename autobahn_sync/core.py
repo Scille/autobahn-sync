@@ -33,13 +33,15 @@ class AutobahnSync(object):
     Main class representing the AutobahnSync application
     """
 
-    def __init__(self, prefix=None):
+    def __init__(self, authmethods=None):
+        self._authmethods = authmethods
         self._session = None
         self._async_runner = None
         self._async_session = None
         self._started = False
         self._callbacks_runner = None
         self._on_running_callbacks = []
+        self._on_challenge_callback = None
 
     @property
     def session(self):
@@ -50,8 +52,9 @@ class AutobahnSync(object):
             raise NotRunningError("No session available, is AutobahnSync running ?")
         return self._session
 
-    def run_in_twisted(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER,
-                       realm=DEFAULT_AUTOBAHN_REALM, **kwargs):
+    def run(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
+            authmethods=None, authid=None, authrole=None, authextra=None,
+            callback=None, **kwargs):
         """
         Start the WAMP connection. Given we cannot run synchronous stuff inside the
         twisted thread, use this function (which returns immediately) to do the
@@ -59,6 +62,11 @@ class AutobahnSync(object):
 
         :param callback: function that will be called inside the spawned thread.
         Put the rest of you init (or you main loop if you have one) inside it
+
+        :param authmethods: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authid: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authrole: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
+        :param authextra: Parameter passed to :meth:`autobahn.wamp.protocol.ApplicationSession.join`
 
         .. note::
             This function must be called instead of :meth:`AutobahnSync.run`
@@ -71,15 +79,18 @@ class AutobahnSync(object):
         blocking = callback is None
 
         def bootstrap_and_callback():
-            self._bootstrap(blocking, url=url, realm=realm, **kwargs)
+            self._bootstrap(blocking, url=url, realm=realm,
+                authmethods=authmethods, authid=authid, authrole=authrole,
+                authextra=authextra, **kwargs)
             if callback:
                 callback()
             self._callbacks_runner.start()
 
         threads.deferToThread(bootstrap_and_callback)
 
-    def run(self, callback=None, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
-            blocking=False, **kwargs):
+    def run(self, url=DEFAULT_AUTOBAHN_ROUTER, realm=DEFAULT_AUTOBAHN_REALM,
+            authmethods=None, authid=None, authrole=None, authextra=None,
+            blocking=False, callback=None, **kwargs):
         """
         Start the background twisted thread and create the WAMP connection
 
@@ -91,7 +102,9 @@ class AutobahnSync(object):
         with ``blocking=True`` to put your WAMP related init
         """
         _init_crochet(in_twisted=False)
-        self._bootstrap(blocking, url=url, realm=realm, **kwargs)
+        self._bootstrap(blocking, url=url, realm=realm,
+                authmethods=authmethods, authid=authid, authrole=authrole,
+                authextra=authextra, **kwargs)
         if callback:
             callback()
         self._callbacks_runner.start()
@@ -114,6 +127,11 @@ class AutobahnSync(object):
 
         Create the WAMP session and configure the `_callbacks_runner`.
         """
+        join_config = {}
+        for key in ('authid', 'authmethods', 'authrole', 'authextra'):
+            val = kwargs.pop(key)
+            if val:
+                join_config[key] = val
         if self._started:
             raise AlreadyRunningError("This AutobahnSync instance is already started")
         self._started = True
@@ -129,8 +147,10 @@ class AutobahnSync(object):
 
             def register_session(config):
                 logger.debug('[CrochetReactor] start register_session')
-                self._async_session = _AsyncSession(config=config)
-                self._session = SyncSession(self._async_session, self._callbacks_runner)
+                self._async_session = _AsyncSession(config=config, join_config=join_config)
+                self._session = SyncSession(self._callbacks_runner, self._on_challenge_callback)
+                self._async_session.connect_to_sync(self._session)
+                self._session.connect_to_async(self._async_session)
 
                 def resolve(result):
                     logger.debug('[CrochetReactor] callback resolve: %s' % result)
@@ -207,3 +227,16 @@ class AutobahnSync(object):
             return func
 
         return decorator
+
+    def on_challenge(self, func):
+        """Decorator providing a callback to the onChallenge event, use this
+        instead of subclassing :meth:`autobahn.twisted.wamp.ApplicationSession.onChallenge`
+
+        .. note::
+            This decorator can only be used before :meth:`AutobahnSync.run` is called
+            given the ``Challenge`` event is triggered at this time
+        """
+
+        if self._started:
+            raise RuntimeError("Cannot register a on_challenge callback once the session is started")
+        self._on_challenge_callback = func

@@ -60,6 +60,18 @@
                            "register": true
                         }
                      ]
+                  },
+                  {
+                     "name": "role_from_ticket",
+                     "permissions": [
+                        {
+                           "uri": "*",
+                           "publish": true,
+                           "subscribe": true,
+                           "call": true,
+                           "register": true
+                        }
+                     ]
                   }
                ],
                "store": {
@@ -83,6 +95,20 @@
                "paths": {
                   "ws": {
                      "type": "websocket"
+                  },
+                  "ws_auth": {
+                     "type": "websocket",
+                     "auth": {
+                        "ticket": {
+                           "type": "static",
+                           "principals": {
+                              "ticket_user_1": {
+                                 "ticket": "ticket_secret",
+                                 "role": "role_from_ticket"
+                              }
+                           }
+                        }
+                     }
                   }
                }
             }

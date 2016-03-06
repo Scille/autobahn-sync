@@ -9,6 +9,7 @@ __all__ = (
     'subscribe',
     'call',
     'publish',
+    'on_challenge'
 )
 
 
@@ -16,7 +17,7 @@ app = AutobahnSync()
 run = app.run
 register = app.register
 subscribe = app.subscribe
-
+on_challenge = app.on_challenge
 
 def call(*args, **kwargs):
     if not app._started:
