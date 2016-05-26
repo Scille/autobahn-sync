@@ -6,7 +6,7 @@ import pytest
 from autobahn_sync import AutobahnSync, ConnectionRefusedError
 
 
-CROSSBAR_CONF_DIR = path.abspath(path.dirname(__file__)) + '/../.crossbar'
+CROSSBAR_CONF_DIR = path.abspath(path.dirname(__file__)) + '/.crossbar'
 START_CROSSBAR = not pytest.config.getoption("--no-router")
 
 
