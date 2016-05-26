@@ -1,118 +1,167 @@
 {
-   "workers": [
-      {
-         "type": "router",
-         "options": {
-            "pythonpath": [
-               ".."
-            ]
-         },
-         "realms": [
-            {
-               "name": "realm_limited",
-               "roles": [
-                  {
-                     "name": "anonymous",
-                     "permissions": [
-                        {
-                           "uri": "pubsub.no_publish.*",
-                           "publish": false,
-                           "subscribe": true,
-                           "call": true,
-                           "register": true
-                        },
-                        {
-                           "uri": "pubsub.no_subscribe.*",
-                           "publish": true,
-                           "subscribe": false,
-                           "call": true,
-                           "register": true
-                        },
-                        {
-                           "uri": "rpc.no_call.*",
-                           "publish": true,
-                           "subscribe": true,
-                           "call": false,
-                           "register": true
-                        },
-                        {
-                           "uri": "rpc.no_register.*",
-                           "publish": true,
-                           "subscribe": true,
-                           "call": true,
-                           "register": false
-                        }
-                     ]
-                  }
-               ]
+    "version": 2,
+    "workers": [
+        {
+            "type": "router",
+            "options": {
+                "pythonpath": [
+                    ".."
+                ]
             },
-            {
-               "name": "realm1",
-               "roles": [
-                  {
-                     "name": "anonymous",
-                     "permissions": [
+            "realms": [
+                {
+                    "name": "realm_limited",
+                    "roles": [
                         {
-                           "uri": "*",
-                           "publish": true,
-                           "subscribe": true,
-                           "call": true,
-                           "register": true
+                            "name": "anonymous",
+                            "permissions": [
+                                {
+                                    "uri": "pubsub.no_publish.",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": false,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                },
+                                {
+                                    "uri": "pubsub.no_subscribe.",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": false
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                },
+                                {
+                                    "uri": "rpc.no_call.",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": false,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                },
+                                {
+                                    "uri": "rpc.no_register.",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": false,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                }
+                            ]
                         }
-                     ]
-                  },
-                  {
-                     "name": "role_from_ticket",
-                     "permissions": [
+                    ]
+                },
+                {
+                    "name": "realm1",
+                    "roles": [
                         {
-                           "uri": "*",
-                           "publish": true,
-                           "subscribe": true,
-                           "call": true,
-                           "register": true
+                            "name": "anonymous",
+                            "permissions": [
+                                {
+                                    "uri": "",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                }
+                            ]
+                        },
+                        {
+                            "name": "role_from_ticket",
+                            "permissions": [
+                                {
+                                    "uri": "",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                }
+                            ]
                         }
-                     ]
-                  }
-               ],
-               "store": {
-                  "type": "memory",
-                  "event-history": [
-                     {
-                        "uri": "rpc.historized.event",
-                        "limit": 10000
-                     }
-                  ]
-               }
-            }
-         ],
-         "transports": [
-            {
-               "type": "web",
-               "endpoint": {
-                  "type": "tcp",
-                  "port": 8080
-               },
-               "paths": {
-                  "ws": {
-                     "type": "websocket"
-                  },
-                  "ws_auth": {
-                     "type": "websocket",
-                     "auth": {
-                        "ticket": {
-                           "type": "static",
-                           "principals": {
-                              "ticket_user_1": {
-                                 "ticket": "ticket_secret",
-                                 "role": "role_from_ticket"
-                              }
-                           }
+                    ],
+                    "store": {
+                        "type": "memory",
+                        "event-history": [
+                            {
+                                "uri": "rpc.historized.event",
+                                "limit": 10000
+                            }
+                        ]
+                    }
+                }
+            ],
+            "transports": [
+                {
+                    "type": "web",
+                    "endpoint": {
+                        "type": "tcp",
+                        "port": 8080
+                    },
+                    "paths": {
+                        "ws": {
+                            "type": "websocket"
+                        },
+                        "ws_auth": {
+                            "type": "websocket",
+                            "auth": {
+                                "ticket": {
+                                    "type": "static",
+                                    "principals": {
+                                        "ticket_user_1": {
+                                            "ticket": "ticket_secret",
+                                            "role": "role_from_ticket"
+                                        }
+                                    }
+                                }
+                            }
                         }
-                     }
-                  }
-               }
-            }
-         ]
-      }
-   ]
+                    }
+                }
+            ]
+        }
+    ]
 }
