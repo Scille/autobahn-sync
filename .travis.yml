@@ -10,7 +10,7 @@ before_script:
 - pip install -U pip==8.1.1
 - pip install -r dev-requirements.txt
 - pip install pytest-cov
-- pip instal -e .
+- pip install -e .
 script:
 - flake8 .
 - py.test --cov=autobahn_sync
