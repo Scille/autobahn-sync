@@ -6,12 +6,13 @@ python:
 install:
 - pip install tox-travis coveralls
 before_script:
-# Fix https://github.com/crossbario/crossbar/issues/793
-- python -m tox -e py27 --notest || return 0
-- .tox/py27/bin/pip install -U pip==8.1.1
-- python -m tox -e py34 --notest || return 0
-- .tox/py34/bin/pip install -U pip==8.1.1
-script: tox
+# Fix https://github.com/crossbario/crossbar/issues/793 by stopping using tox
+- pip install -U pip==8.1.1
+- pip install -r dev-requirements.txt
+- pip install pytest-cov
+script:
+- flake8 .
+- py.test --cov=autobahn_sync
 after_success:
   - coveralls
 deploy:
