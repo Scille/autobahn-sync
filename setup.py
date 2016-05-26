@@ -14,7 +14,7 @@ REQUIRES = (
 
 setup(
     name='autobahn-sync',
-    version='0.3.1',
+    version='0.3.2',
     description='Bring autobahn to your synchronous apps !',
     long_description=readme,
     author='Emmanuel Leblond',
