@@ -12,6 +12,9 @@ class TestBadRouter(object):
         wamp = AutobahnSync()
         with pytest.raises(ConnectionRefusedError):
             wamp.run(url=u'ws://localhost:9999/missing')
+        # Make sure we can reuse the wamp object
+        with pytest.raises(ConnectionRefusedError):
+            wamp.run(url=u'ws://localhost:9999/missing')
 
     def test_bad_realm(self, crossbar):
         wamp = AutobahnSync()

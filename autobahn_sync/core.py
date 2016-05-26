@@ -134,7 +134,6 @@ class AutobahnSync(object):
                 join_config[key] = val
         if self._started:
             raise AlreadyRunningError("This AutobahnSync instance is already started")
-        self._started = True
         if blocking:
             self._callbacks_runner = CallbacksRunner()
         else:
@@ -182,6 +181,7 @@ class AutobahnSync(object):
         for cb in self._on_running_callbacks:
             cb()
         self._on_running_callbacks = []
+        self._started = True
         logger.debug('[MainThread] start callbacks runner')
 
     def register(self, procedure=None, options=None):
