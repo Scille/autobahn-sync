@@ -4,8 +4,13 @@ python:
 - '3.4'
 - '2.7'
 install:
-- pip install virtualenv==15.0.0 # https://github.com/crossbario/crossbar/issues/793
 - pip install tox-travis coveralls
+before_script:
+# Fix https://github.com/crossbario/crossbar/issues/793
+- python -m tox -e py27 --notest || return 0
+- .tox/py27/bin/pip install -U pip==8.1.1
+- python -m tox -e py34 --notest || return 0
+- .tox/py34/bin/pip install -U pip==8.1.1
 script: tox
 after_success:
   - coveralls
