@@ -3,42 +3,21 @@ import re
 from setuptools import setup, find_packages
 
 
+with open('README.rst', 'rb') as readme_file:
+    readme = readme_file.read().decode('utf8')
+
+
 REQUIRES = (
     'crochet>=1.4.0',
     'autobahn>=0.12.0'
 )
 
 
-def find_version(fname):
-    """Attempts to find the version number in the file names fname.
-    Raises RuntimeError if not found.
-    """
-    version = ''
-    with open(fname, 'r') as fp:
-        reg = re.compile(r'__version__ = [\'"]([^\'"]*)[\'"]')
-        for line in fp:
-            m = reg.match(line)
-            if m:
-                version = m.group(1)
-                break
-    if not version:
-        raise RuntimeError('Cannot find version information')
-    return version
-
-__version__ = find_version('autobahn_sync/__init__.py')
-
-
-def read(fname):
-    with open(fname) as fp:
-        content = fp.read()
-    return content
-
-
 setup(
     name='autobahn-sync',
-    version=__version__,
+    version='0.3.1',
     description='Bring autobahn to your synchronous apps !',
-    long_description=read('README.rst'),
+    long_description=readme,
     author='Emmanuel Leblond',
     author_email='emmanuel.leblond@gmail.com',
     url='https://github.com/Scille/autobahn_sync',
