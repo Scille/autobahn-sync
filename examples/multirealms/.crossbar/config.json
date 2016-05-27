@@ -1,69 +1,85 @@
 {
-   "controller": {
-   },
-   "workers": [
-      {
-         "type": "router",
-         "options": {
-            "pythonpath": [
-               ".."
-            ]
-         },
-         "realms": [
-            {
-               "name": "realm1",
-               "roles": [
-                  {
-                     "name": "anonymous",
-                     "permissions": [
-                        {
-                           "uri": "*",
-                           "publish": true,
-                           "subscribe": true,
-                           "call": true,
-                           "register": true
-                        }
-                     ]
-                  }
-               ]
+    "version": 2,
+    "controller": {},
+    "workers": [
+        {
+            "type": "router",
+            "options": {
+                "pythonpath": [
+                    ".."
+                ]
             },
-            {
-               "name": "realm2",
-               "roles": [
-                  {
-                     "name": "anonymous",
-                     "permissions": [
+            "realms": [
+                {
+                    "name": "realm1",
+                    "roles": [
                         {
-                           "uri": "*",
-                           "publish": true,
-                           "subscribe": true,
-                           "call": true,
-                           "register": true
+                            "name": "anonymous",
+                            "permissions": [
+                                {
+                                    "uri": "",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                }
+                            ]
                         }
-                     ]
-                  }
-               ]
-            }
-         ],
-         "transports": [
-            {
-               "type": "web",
-               "endpoint": {
-                  "type": "tcp",
-                  "port": 8080
-               },
-               "paths": {
-                  "/": {
-                     "type": "wsgi",
-                     "module": "app",
-                     "object": "app"
-                  },
-                  "ws": {
-                     "type": "websocket"
-                  }
-               }
-            }
-         ]
-      }
-   ]
+                    ]
+                },
+                {
+                    "name": "realm2",
+                    "roles": [
+                        {
+                            "name": "anonymous",
+                            "permissions": [
+                                {
+                                    "uri": "",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "transports": [
+                {
+                    "type": "web",
+                    "endpoint": {
+                        "type": "tcp",
+                        "port": 8080
+                    },
+                    "paths": {
+                        "/": {
+                            "type": "wsgi",
+                            "module": "app",
+                            "object": "app"
+                        },
+                        "ws": {
+                            "type": "websocket"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
 }
